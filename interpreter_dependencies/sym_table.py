@@ -2,8 +2,8 @@ import io
 from time import time_ns
 from typing import Dict, TypeVar, Optional, Iterable, Tuple, Callable
 
-from parsed_ast import ClassDecl
-from parsed_token import TokenContents
+from .parsed_ast import ClassDecl
+from .parsed_token import TokenContents
 
 V = TypeVar("V")
 

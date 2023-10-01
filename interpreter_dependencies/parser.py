@@ -1,14 +1,14 @@
 from typing import Optional, Callable
 from time import time
 import logging
-from parsed_ast import Node, Program, ProgramBlock, InstrBlock, Instr, ArrayDecl, VarAssign, AddrInstr, \
+from .parsed_ast import Node, Program, ProgramBlock, InstrBlock, Instr, ArrayDecl, VarAssign, AddrInstr, \
     AddrExpr, AddrAssign, Identifier, AddrMember, IndexingSuffix, ExprList, Expr, Term, Factor, SimpleExpr, \
     CallableSuffix, IntLiteral, AddrIdOrCall, AddOp, MulOp, UnaryMinus, UnaryNot, PowOp, IfElse, ElseIf, \
     InnerInstrBlock, GoToInstr, SwitchCase, ForLoop, WhileLoop, DoUntil, StrLiteral, NumLiteral, PrintInstr, \
     BuiltInFunCall, FunDecl, ParamList, Param, FunInstrBlock, ReturnInstr, ProcDecl, ProcInstrBlock, FunExpr, CastStr, CastInt, CastFloat, Input, Length, StrSubstring, ClassDecl, ClassBlock, ClassMember, AttrDecl, \
     EndOfFile, ReadLine, WriteLine, FileClose, OpenRead, OpenWrite, NewExpr, BoolLiteral
-from lexer import Lexer
-from parsed_token import TokenVals, ParsedToken, TokenContents
+from .lexer import Lexer
+from .parsed_token import TokenVals, ParsedToken, TokenContents
 
 
 class Parser:
@@ -27,7 +27,8 @@ class Parser:
         if self.on_parse_begin is not None:
             self.on_parse_begin()
         if (next_token := self.__lexer.next()) is not None:
-            self.__raise_error(SyntaxError(f"Unexpected token {next_token.text}"))
+            self.curr_line_index = next_token.line_index
+            self.__raise_error(SyntaxError(f"Unexpected '{next_token.text}'"))
         if self.on_parse_finish is not None:
             self.on_parse_finish()
         return result
@@ -130,7 +131,7 @@ class Parser:
             result.add_sub_node(
                 self.__tree_expect(ctx,
                                    self.__addr_assign,
-                                   "Syntax error: unfinished address instruction"))
+                                   "Expected variable assignment"))
             # In case parsing the assignment expression enabled the IS_INSTR flag
             ctx.pop(AddrIdOrCall.IS_INSTR, False)
         return result
@@ -870,8 +871,7 @@ class Parser:
             return False
         return True
 
-    @staticmethod
-    def __tree_expect(ctx: dict, parse_method: Callable, err_msg: str) -> Node:
+    def __tree_expect(self, ctx: dict, parse_method: Callable, err_msg: str) -> Node:
         """Enforces that a parsing method returns a syntax tree and not None.
 
         :param ctx: parsing context to pass on to the parsing method.
@@ -882,7 +882,7 @@ class Parser:
         result: Optional[Node] = parse_method(ctx)
         if result:
             return result
-        raise SyntaxError(err_msg)
+        self.__raise_error(SyntaxError(err_msg))
 
     def __raise_error(self, e: Exception):
         if self.on_error is not None:

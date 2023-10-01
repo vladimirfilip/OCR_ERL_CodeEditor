@@ -1,7 +1,10 @@
 import sys
+from typing import Optional, Callable
+
 from PyQt6 import QtCore, QtWidgets
-from PyQt6.QtGui import QTextCursor
-from PyQt6.QtWidgets import QPlainTextEdit
+from PyQt6.QtCore import QEvent
+from PyQt6.QtGui import QTextCursor, QWheelEvent
+from PyQt6.QtWidgets import QPlainTextEdit, QHBoxLayout, QWidget
 
 
 class InputTextBox(QPlainTextEdit):
@@ -23,30 +26,38 @@ class InputTextBox(QPlainTextEdit):
 
 
 class Terminal(QtWidgets.QPlainTextEdit):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, on_run_start: Optional[Callable] = None, on_run_end: Optional[Callable] = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fixed_contents: str = ""
         self.current_contents: str = ""
         self.cleared = False
         self.textChanged.connect(self.on_text_changed)
         self.setReadOnly(True)
+        self.process: Optional[QtCore.QProcess] = None
+        self.on_run_start = on_run_start
+        self.on_run_end = on_run_end
+
+    def run(self, *args):
         self.process = QtCore.QProcess(self)
         self.process.setProgram(sys.executable)
         self.process.readyReadStandardOutput.connect(self.on_ready_read_std_output)
         self.process.readyReadStandardError.connect(self.on_ready_read_std_err)
-
-    def run(self, *args):
         self.process.setArguments(args)
         self.process.start()
         self.process.finished.connect(self.on_process_end)
         self.setReadOnly(False)
+        if self.on_run_start is not None:
+            self.on_run_start()
 
     @QtCore.pyqtSlot(int, QtCore.QProcess.ExitStatus)
     def on_process_end(self, exit_code):
-        msg = f"\n\nProcess finished with exit code {exit_code}"
+        msg = f"\n\nFinished execution with exit code {exit_code}"
         self.fixed_contents += msg
         self.insertPlainText(msg)
         self.setReadOnly(True)
+        self.process = None
+        if self.on_run_end:
+            self.on_run_end()
 
     @QtCore.pyqtSlot()
     def on_ready_read_std_output(self):
@@ -83,8 +94,16 @@ class Terminal(QtWidgets.QPlainTextEdit):
             self.send_input(non_fixed_contents)
             self.fixed_contents += non_fixed_contents
 
+    def stop_running(self):
+        self.process.close()
+        self.process = None
+
+    @property
+    def is_running(self):
+        return self.process is not None
+
     def clear(self):
-        super().clear()
         self.cleared = True
         self.current_contents = ""
         self.fixed_contents = ""
+        super().clear()

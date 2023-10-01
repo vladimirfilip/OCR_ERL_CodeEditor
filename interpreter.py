@@ -1,10 +1,10 @@
 from typing import Iterable, Iterator
 from sys import argv, stderr
 from time import time
-from ast_executor import AstExecutor
-from lexer import Lexer
-from parser import Parser
-from tokenizer import Tokenizer
+from interpreter_dependencies.ast_executor import AstExecutor
+from interpreter_dependencies.lexer import Lexer
+from interpreter_dependencies.parser import Parser
+from interpreter_dependencies.tokenizer import Tokenizer
 import logging
 
 
@@ -64,5 +64,6 @@ def get_lines(file_name: str) -> Iterator[str]:
             yield line.rstrip("\n")
 
 
-assert len(argv) > 1, "name of input text file required"
-Interpreter(get_lines(argv[1])).interpret()
+if __name__ == "__main__":
+    assert len(argv) > 1, "name of input text file required"
+    Interpreter(get_lines(argv[1])).interpret()

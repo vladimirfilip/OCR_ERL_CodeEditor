@@ -2,7 +2,7 @@ from enum import Enum
 from functools import cache
 from typing import Iterable, Optional
 
-from parsed_token import TokenVals
+from .parsed_token import TokenVals
 
 
 class NodeKinds(Enum):

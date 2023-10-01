@@ -3,13 +3,13 @@ import logging
 import os
 from time import time_ns
 from typing import Callable, Type, Dict, TypeVar, Optional, List, Tuple
-from parsed_ast import Node, Program, VarAssign, Identifier, IntLiteral, ArrayDecl, AddrMember, ExprList, \
+from .parsed_ast import Node, Program, VarAssign, Identifier, IntLiteral, ArrayDecl, AddrMember, ExprList, \
     Expr, Term, Factor, UnaryMinus, IfElse, UnaryNot, SwitchCase, ForLoop, GoToInstr, InnerInstrBlock, DoUntil, \
     WhileLoop, StrLiteral, NumLiteral, PrintInstr, FunDecl, AddrIdOrCall, Param, ReturnInstr, FunInstrBlock, CallableSuffix, ProcDecl, ProcInstrBlock, CastStr, CastInt, CastFloat, Length, StrSubstring, Input, EndOfFile, \
     ReadLine, WriteLine, FileClose, OpenRead, OpenWrite, ClassDecl, NewExpr, AddrExpr, ClassMember, AttrDecl, BoolLiteral
-from parsed_token import TokenVals, KNOWN_TOKEN_VALS, TokenContents
-from parser import Parser
-from sym_table import V, SymTable, ArrayVal, SymAddr, NullVal, ObjSymTable
+from .parsed_token import TokenVals, KNOWN_TOKEN_VALS, TokenContents
+from .parser import Parser
+from .sym_table import V, SymTable, ArrayVal, SymAddr, NullVal, ObjSymTable
 from io import TextIOWrapper
 
 T = TypeVar("T")
