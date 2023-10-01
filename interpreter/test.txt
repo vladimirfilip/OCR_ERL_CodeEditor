@@ -1,0 +1,18 @@
+function toBinary(n)
+    result = ""
+    while n > 0
+        result = str(n MOD 2) + result
+        n = n DIV 2
+    endwhile
+    return result
+endfunction
+
+s = ""
+while true
+    s = int(input("Enter a number between 1 and 255. "))
+    if s >= 1 AND s <= 255 then
+        print(toBinary(s))
+        break
+    endif
+    print("Input not valid please try again")
+endwhile

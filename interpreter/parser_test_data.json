@@ -1,0 +1,2748 @@
+{
+    "test_arr_decl": {
+        "Program": {
+            "sub_nodes" : [
+                {
+                    "ArrayDecl" : {
+                        "is_global": "False",
+                        "name": "x",
+                        "dims": [
+                            { "IntLiteral": { "val": 2 } },
+                            { "Identifier": { "name": "y" } }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_global_arr_decl": {
+        "Program": {
+            "sub_nodes" : [
+                {
+                    "ArrayDecl" : {
+                         "is_global": "True",
+                         "name": "y",
+                         "dims": [
+                            { "IntLiteral": { "val": 3 } },
+                            { "IntLiteral": { "val": 5 } }
+                         ]
+
+                    }
+                }
+            ]
+        }
+    },
+    "test_var_assign": {
+        "Program": {
+            "sub_nodes": [{
+                "VarAssign": {
+                    "is_global": "False",
+                    "sub_nodes": [
+                        {
+                            "Identifier": { "name": "x" }
+                        },
+                        { "IntLiteral": { "val": 3 } }
+                    ]
+                }
+            }]
+        }
+    },
+    "test_var_assign_unary_minus": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            { "Identifier": { "name": "x" } },
+                            {
+                                "Term": {
+                                    "sub_nodes": [
+                                        {
+                                            "UnaryMinus": {
+                                                "sub_nodes": [{"IntLiteral": { "val": 3 }}]
+                                            }
+                                        },
+                                        { "MulOp": { "val": "*" } },
+                                        { "IntLiteral": { "val": 5 } }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_var_assign_with_bool_expr": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            { "Identifier": { "name": "x" } },
+                            {
+                                "Factor": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "y" } },
+                                        { "PowOp": { "val": "==" } },
+                                        { "StrLiteral": { "val": "3" } }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_var_assign_with_expr": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            { "Identifier": { "name":  "x" } },
+                            {
+                                "Expr": {
+                                    "sub_nodes": [
+                                        { "IntLiteral": { "val":  3 } },
+                                        { "AddOp": { "val": "+" } },
+                                        {
+                                            "Term": {
+                                                "sub_nodes": [
+                                                    { "IntLiteral":  { "val":  4} },
+                                                    { "MulOp":  { "val":  "*" } },
+                                                    { "IntLiteral":  { "val":  5} }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_var_assign_with_longer_bool_expr": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            { "Identifier": {"name": "x"} },
+                            {
+                                "Expr": {
+                                    "sub_nodes": [
+                                        {
+                                            "UnaryNot": {
+                                                "sub_nodes": [
+                                                    {
+                                                        "Term": {
+                                                            "sub_nodes": [
+                                                                {
+                                                                    "Factor": {
+                                                                        "sub_nodes": [
+                                                                            {"Identifier": {"name": "y"}},
+                                                                            {"PowOp": {"val": "=="}},
+                                                                            {"NumLiteral": {"val": 3.09}}
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                { "MulOp": {"val": "OR"}},
+                                                                {
+                                                                    "Factor": {
+                                                                        "sub_nodes": [
+                                                                            {"IntLiteral": {"val": 4}},
+                                                                            {"PowOp": {"val": "!="}},
+                                                                            {"IntLiteral": {"val": 6}}
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {"AddOp": {"val": "AND"}},
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "y"}},
+                                                    {"PowOp": {"val": ">"}},
+                                                    {"IntLiteral": {"val": 7}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_var_assign_with_longer_expr": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "x"}},
+                            {
+                                "Expr": {
+                                    "sub_nodes": [
+                                        {
+                                            "UnaryMinus": {
+                                                "sub_nodes": [
+                                                    { "NumLiteral": { "val": 3.2 } }
+                                                ]
+                                            }
+                                        },
+                                        {"AddOp": { "val": "+" }},
+                                        {
+                                            "Term": {
+                                                "sub_nodes": [
+                                                    { "IntLiteral": {"val": 4} },
+                                                    { "MulOp": { "val": "*" } },
+                                                    { "IntLiteral": {"val": 5}},
+                                                    { "MulOp": { "val": "/" }},
+                                                    {
+                                                        "Expr": {
+                                                            "sub_nodes": [
+                                                                {"IntLiteral": {"val": 5}},
+                                                                {"AddOp": { "val": "-" }},
+                                                                {
+                                                                    "Factor": {
+                                                                        "sub_nodes": [
+                                                                            {"IntLiteral": {"val": 2}},
+                                                                            {"PowOp": { "val": "^" }},
+                                                                            {"IntLiteral": {"val": 2}}
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {"MulOp": {"val": "MOD"}},
+                                                    {
+                                                        "Term": {
+                                                            "sub_nodes": [
+                                                                {"IntLiteral": {"val": 3}},
+                                                                {"MulOp": {"val": "DIV"}},
+                                                                {"IntLiteral": {"val": 2}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_field_assign": {
+        "Program": {
+            "sub_nodes": [{
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {
+                                "AddrExpr": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "x" } },
+                                        { "Identifier": { "name": "y" } }
+                                    ]
+                                }
+                            }, { "IntLiteral": { "val": 3 } }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_indexed_field_assign": {
+        "Program": {
+            "sub_nodes": [{
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {
+                                "AddrExpr": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "x" } },
+                                        {
+                                            "AddrMember": {
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "y" } },
+                                                    {
+                                                        "IntLiteral": { "val": 0 }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }, {
+                                "IntLiteral": { "val": 3 }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_matrix_element_assign": {
+        "Program": {
+            "sub_nodes": [{
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {
+                                "AddrExpr": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "x" } },
+                                        {
+                                            "AddrMember": {
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "y" } },
+                                                    {
+                                                        "ExprList": {
+                                                            "sub_nodes": [
+                                                                {
+                                                                    "IntLiteral": { "val": 0 }
+                                                                },
+                                                                {
+                                                                    "IntLiteral": { "val": 1 }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }, {
+                                "UnaryMinus": {
+                                    "sub_nodes": [
+                                        { "IntLiteral": { "val": 3 } }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_field_of_variable_index_assign": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {
+                                "AddrExpr": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "x" } },
+                                        {
+                                            "AddrMember": {
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "y" } },
+                                                    {
+                                                        "AddrIdOrCall": {
+                                                            "sub_nodes": [
+                                                                { "Identifier": { "name": "f" } },
+                                                                { "NumLiteral": { "val": 0.3 } }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "IntLiteral": { "val": 3 }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_mixed_assign": {
+        "Program": {
+            "sub_nodes": [{
+                "VarAssign": {
+                    "is_global": "False",
+                    "sub_nodes": [
+                        {
+                            "AddrExpr": {
+                                "sub_nodes": [
+                                    { "Identifier": { "name": "x" } },
+                                    {
+                                        "AddrMember": {
+                                            "sub_nodes": [
+                                                { "Identifier": { "name": "y" } },
+                                                {
+                                                    "AddrIdOrCall": {
+                                                        "sub_nodes": [
+                                                            { "Identifier": { "name": "f" } },
+                                                            {
+                                                                "AddrIdOrCall": {
+                                                                    "sub_nodes": [
+                                                                        { "Identifier": { "name": "g" } },
+                                                                        {
+                                                                            "AddrExpr": {
+                                                                                "sub_nodes": [
+                                                                                    { "Identifier": { "name": "u" } },
+                                                                                    {
+                                                                                        "AddrMember": {
+                                                                                            "sub_nodes": [
+                                                                                                { "Identifier": { "name": "v" } },
+                                                                                                {
+                                                                                                    "ExprList": {
+                                                                                                        "sub_nodes": [
+                                                                                                            { "IntLiteral": { "val": 1 } },
+                                                                                                            { "IntLiteral": { "val": 2 } }
+                                                                                                        ]
+                                                                                                    }
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }, {
+                            "AddrIdOrCall": {
+                                "sub_nodes": [
+                                    { "Identifier": { "name": "h" } },
+                                    {
+                                        "ExprList": {
+                                            "sub_nodes": [
+                                                { "Identifier": { "name": "i" } },
+                                                {
+                                                    "AddrExpr": {
+                                                        "sub_nodes": [
+                                                            { "Identifier": { "name": "k" } },
+                                                            {
+                                                                "AddrMember": {
+                                                                    "sub_nodes": [
+                                                                        { "Identifier": { "name": "l" } },
+                                                                        {
+                                                                            "ExprList": {
+                                                                                "sub_nodes": [
+                                                                                    {
+                                                                                        "AddrExpr": {
+                                                                                            "sub_nodes": [
+                                                                                                { "Identifier": { "name": "m" } },
+                                                                                                { "Identifier": { "name": "o" } },
+                                                                                                { "Identifier": { "name": "p" } }
+                                                                                            ]
+                                                                                        }
+                                                                                    },
+                                                                                    { "Identifier": { "name": "q" } }
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }]
+        }
+    },
+    "test_callable_member_assign": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {
+                                "AddrExpr": {
+                                    "sub_nodes": [
+                                        {
+                                            "AddrIdOrCall": {
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "f" } },
+                                                    { "Identifier": { "name": "a" } }
+                                                ]
+                                            }
+                                        },
+                                        { "Identifier": { "name": "b" } }
+                                    ]
+                                }
+                            },
+                            { "Identifier": { "name": "c" } }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_sub_callable_member_assign": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {
+                                "AddrExpr": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "a" } },
+                                        {
+                                            "AddrIdOrCall": {
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "f" } },
+                                                    { "Identifier": { "name": "b" } }
+                                                ]
+                                            }
+                                        },
+                                        { "Identifier": { "name": "c" } }
+                                    ]
+                                }
+                            },
+                            { "Identifier": { "name": "d" }}
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_long_sub_callable_member_assign": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {
+                                "AddrExpr": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "a" } },
+                                        {
+                                            "AddrMember": {
+                                                "sub_nodes": [
+                                                    {
+                                                        "AddrIdOrCall": {
+                                                            "sub_nodes": [
+                                                                { "Identifier": { "name": "f" } },
+                                                                {
+                                                                    "Identifier": {
+                                                                        "name": "b"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    { "Identifier": { "name": "c" } }
+                                                ]
+                                            }
+                                        },
+                                        { "Identifier": { "name": "d" } }
+                                    ]
+                                }
+                            },
+                            { "Identifier": { "name": "e" }}
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_if_statement": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "IfElse": {
+                        "sub_nodes": [
+                            {
+                                "Factor": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "x" } },
+                                        { "PowOp": { "val": "==" } },
+                                        { "IntLiteral": { "val": 3 } }
+                                    ]
+                                }
+                            },
+                            {
+                                "VarAssign": {
+                                    "is_global": "False",
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "x" } },
+                                        { "StrLiteral": { "val": "4" } }
+                                    ]
+                                }
+                            },
+                            {
+                                "Factor": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "x" } },
+                                        { "PowOp": { "val": "==" } },
+                                        { "StrLiteral": { "val": "4" } }
+                                    ]
+                                }
+                            },
+                            {
+                                "VarAssign": {
+                                    "is_global": "False",
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "y" } },
+                                        {
+                                            "Expr": {
+                                                "sub_nodes": [
+                                                    { "NumLiteral": { "val": 6.25 } },
+                                                    { "AddOp": { "val": "+" } },
+                                                    { "Identifier": { "name": "x" } }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "VarAssign": {
+                                    "is_global": "False",
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "y" } },
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "x" } },
+                                                    { "PowOp": { "val": "^" } },
+                                                    { "IntLiteral": { "val": 2 } }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_if_else_if_statement": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "IfElse": {
+                        "sub_nodes": [
+                            {
+                                "Factor": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}},
+                                        {"PowOp": {"val": "=="}},
+                                        {"IntLiteral": {"val": 3}}
+                                    ]
+                                }
+                            },
+                            {
+                                "VarAssign": {
+                                    "is_global": "False",
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}},
+                                        {"IntLiteral": {"val": 4}}
+                                    ]
+                                }
+                            },
+                            {
+                                "Factor": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}},
+                                        {"PowOp": {"val": "=="}},
+                                        {"IntLiteral": {"val": 4}}
+                                    ]
+                                }
+                            },
+                            {
+                                "VarAssign": {
+                                    "is_global": "False",
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "y"}},
+                                        {
+                                            "Expr": {
+                                                "sub_nodes": [
+                                                    {
+                                                        "UnaryMinus": {
+                                                            "sub_nodes": [
+                                                                {"NumLiteral": {"val": 6.0232}}
+                                                            ]
+                                                        }
+                                                    },
+                                                    {"AddOp": {"val": "+"}},
+                                                    {"Identifier": {"name": "x"}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_if_statement_with_inner_if": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "IfElse": {
+                        "sub_nodes": [
+                            {
+                                "Factor": {
+                                    "sub_nodes": [
+                                        { "Identifier":  {"name":  "x"}},
+                                        { "PowOp": { "val":  "==" }},
+                                        { "IntLiteral":  { "val":  6}}
+                                    ]
+                                }
+                            },
+                            {
+                                "InnerInstrBlock": {
+                                    "sub_nodes": [
+                                        {
+                                            "VarAssign": {
+                                                "is_global": "False",
+                                                "sub_nodes": [
+                                                    {
+                                                        "Identifier": {
+                                                            "name": "y"
+                                                        }
+                                                    },
+                                                    {
+                                                        "IntLiteral": {
+                                                            "val": 7
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "IfElse": {
+                                                "sub_nodes": [
+                                                    {
+                                                        "Factor": {
+                                                            "sub_nodes": [
+                                                                {
+                                                                    "Identifier": {
+                                                                        "name": "x"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "PowOp": {
+                                                                        "val": "=="
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "IntLiteral": {
+                                                                        "val": 100
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "VarAssign": {
+                                                            "is_global": "False",
+                                                            "sub_nodes": [
+                                                                {
+                                                                    "AddrExpr": {
+                                                                        "sub_nodes": [
+                                                                            {
+                                                                                "Identifier": {
+                                                                                    "name": "y"
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "Identifier": {
+                                                                                    "name": "z"
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "Term": {
+                                                                        "sub_nodes": [
+                                                                            {
+                                                                                "IntLiteral": {
+                                                                                    "val": 3
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "MulOp": {
+                                                                                    "val": "*"
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "Factor": {
+                                                                                    "sub_nodes": [
+                                                                                        {
+                                                                                            "IntLiteral": {
+                                                                                                "val": 6
+                                                                                            }
+                                                                                        },
+                                                                                        {
+                                                                                            "PowOp": {
+                                                                                                "val": "^"
+                                                                                            }
+                                                                                        },
+                                                                                        {
+                                                                                            "Identifier": {
+                                                                                                "name": "x"
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "Factor": {
+                                    "sub_nodes": [
+                                        { "Identifier":  { "name":  "x"}},
+                                        { "PowOp":  {"val":  "=="}},
+                                        { "IntLiteral":  { "val":  7}}
+                                    ]
+                                }
+                            },
+                            {
+                                "VarAssign": {
+                                    "is_global": "False",
+                                    "sub_nodes": [
+                                        {
+                                            "AddrExpr": {
+                                                "sub_nodes": [
+                                                    { "Identifier":  { "name": "y"}},
+                                                    { "Identifier":  { "name": "z"}}
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "Expr": {
+                                                "sub_nodes": [
+                                                    {
+                                                        "Term": {
+                                                            "sub_nodes": [
+                                                                { "IntLiteral": {"val": 6}},
+                                                                { "MulOp": {"val": "*"} },
+                                                                { "Identifier": {"name":  "x"}}
+                                                            ]
+                                                        }
+                                                    },
+                                                    { "AddOp": { "val": "+"} },
+                                                    { "Identifier": { "name": "x"} },
+                                                    { "AddOp": { "val": "-"} },
+                                                    { "IntLiteral": { "val": 3}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "VarAssign": {
+                                    "is_global": "False",
+                                    "sub_nodes": [
+                                        {
+                                            "AddrExpr": {
+                                                "sub_nodes": [
+                                                    { "Identifier":  { "name": "y"}},
+                                                    { "Identifier":  { "name": "z"}}
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    {
+                                                        "Expr": {
+                                                            "sub_nodes": [
+                                                                { "IntLiteral":  {"val": 6} },
+                                                                { "AddOp":  {"val": "+"} },
+                                                                { "Identifier": {"name": "x"} }
+                                                            ]
+                                                        }
+                                                    },
+                                                    { "PowOp": {"val": "=="} },
+                                                    {
+                                                        "Term": {
+                                                            "sub_nodes": [
+                                                                { "Identifier": { "name": "y"}},
+                                                                { "MulOp": {"val": "DIV"}},
+                                                                { "IntLiteral": { "val":  2}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_for_loop": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "ForLoop": {
+                        "sub_nodes": [
+                            { "Identifier": { "name": "i" } },
+                            { "IntLiteral": { "val": 0 } },
+                            { "Identifier": { "name": "x" } },
+                            {
+                                "InnerInstrBlock": {
+                                    "sub_nodes": [
+                                        {
+                                            "VarAssign": {
+                                                "is_global": "False",
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "y" } },
+                                                    {
+                                                        "Term": {
+                                                            "sub_nodes": [
+                                                                { "Identifier": { "name": "i" } },
+                                                                { "MulOp": { "val": "*" } },
+                                                                { "IntLiteral": { "val": 2 } }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "VarAssign": {
+                                                "is_global": "False",
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "a" } },
+                                                    {
+                                                        "Term": {
+                                                            "sub_nodes": [
+                                                                { "Identifier": { "name": "i" } },
+                                                                { "MulOp": { "val": "*" } },
+                                                                { "IntLiteral": { "val": 3 } }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_for_loop_nested": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "ForLoop": {
+                        "sub_nodes": [
+                            { "Identifier": {"name": "i"}},
+                            { "IntLiteral": {"val": 0}},
+                            { "Identifier": {"name": "n"}},
+                            {
+                                "InnerInstrBlock": {
+                                    "sub_nodes": [
+                                        {
+                                            "VarAssign": {
+                                                "is_global": "False",
+                                                "sub_nodes": [
+                                                    { "Identifier": {"name": "z"}},
+                                                    { "Identifier": {"name": "i"}}
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "ForLoop": {
+                                                "sub_nodes": [
+                                                    { "Identifier": {"name": "j"}},
+                                                    { "IntLiteral": {"val": 0}},
+                                                    { "Identifier": {"name": "n"}},
+                                                    {
+                                                        "InnerInstrBlock": {
+                                                            "sub_nodes": [
+                                                                {
+                                                                    "VarAssign": {
+                                                                        "is_global": "False",
+                                                                        "sub_nodes": [
+                                                                            { "Identifier": {"name": "x"}},
+                                                                            { "Identifier": {"name": "j"}}
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "VarAssign": {
+                                                                        "is_global": "False",
+                                                                        "sub_nodes": [
+                                                                            { "Identifier": {"name": "y"}},
+                                                                            { "Identifier": {"name": "i"}}
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_while_loop": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "WhileLoop": {
+                        "sub_nodes": [
+                            {
+                                "Term": {
+                                    "sub_nodes": [
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "x" } },
+                                                    { "PowOp": { "val": "==" } },
+                                                    {
+                                                        "AddrExpr": {
+                                                            "sub_nodes": [
+                                                                { "Identifier": { "name": "y" } },
+                                                                { "Identifier": { "name": "z" } }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        { "MulOp": { "val": "OR" } },
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    { "IntLiteral": { "val": 9 } },
+                                                    { "PowOp": { "val": "==" } },
+                                                    { "IntLiteral": { "val": 0 } }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "InnerInstrBlock": {
+                                    "sub_nodes": [
+                                        {
+                                            "VarAssign": {
+                                                "is_global": "False",
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "x" } },
+                                                    {
+                                                        "Expr": {
+                                                            "sub_nodes": [
+                                                                { "StrLiteral": { "val": "no " } },
+                                                                { "AddOp": { "val": "+" } },
+                                                                { "Identifier": { "name": "x" } }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "VarAssign": {
+                                                "is_global": "False",
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "z" } },
+                                                    {
+                                                        "Factor": {
+                                                            "sub_nodes": [
+                                                                { "Identifier": { "name": "z" } },
+                                                                { "PowOp": { "val": "^" } },
+                                                                { "IntLiteral": { "val": 2 } }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_nested_while_loops": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "WhileLoop": {
+                        "sub_nodes": [
+                            {
+                                "Expr": {
+                                    "sub_nodes": [
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "x"}},
+                                                    {"PowOp": {"val": "=="}},
+                                                    {
+                                                        "AddrExpr": {
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "y"}},
+                                                                {"Identifier": {"name": "z"}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {"AddOp": {"name": "+"}},
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "j"}},
+                                                    {"PowOp": {"val": "=="}},
+                                                    {"Identifier": {"name": "k"}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "InnerInstrBlock": {
+                                    "sub_nodes": [
+                                        {
+                                            "VarAssign": {
+                                                "is_global": "False",
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "x"}},
+                                                    {"StrLiteral": {"val": "not equal to y.z"}}
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "WhileLoop": {
+                                                "sub_nodes": [
+                                                    {
+                                                        "Factor": {
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "a"}},
+                                                                {"PowOp": {"val": "!="}},
+                                                                {"Identifier": {"name": "b"}}
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "VarAssign": {
+                                                            "is_global": "False",
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "x"}},
+                                                                {
+                                                                    "Expr": {
+                                                                        "sub_nodes": [
+                                                                            {"Identifier": {"name": "y"}},
+                                                                            {"AddOp": {"val": "+"}},
+                                                                            {"IntLiteral": {"val": 1}}
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_do_until_loop": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "DoUntil": {
+                        "sub_nodes": [
+                            {
+                                "InnerInstrBlock": {
+                                    "sub_nodes": [
+                                        {
+                                            "VarAssign": {
+                                                "is_global": "False",
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "x" } },
+                                                    { "IntLiteral": { "val": 3 } }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "VarAssign": {
+                                                "is_global": "False",
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "y" } },
+                                                    {
+                                                        "Term": {
+                                                            "sub_nodes": [
+                                                                { "IntLiteral": { "val": 4 } },
+                                                                { "MulOp": { "val": "*" } },
+                                                                { "IntLiteral": { "val": 6 } }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        { "GoToInstr": { "val": "continue" } }
+                                    ]
+                                }
+                            },
+                            {
+                                "Factor": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "y" } },
+                                        { "PowOp": { "val": "==" } },
+                                        { "IntLiteral": { "val": 24 } }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_switch_case": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "SwitchCase": {
+                        "sub_nodes": [
+                            { "Identifier": { "name":  "x"}},
+                            { "IntLiteral": { "val": 2 }},
+                            {
+                                "VarAssign": {
+                                    "is_global": "False",
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}},
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "x"}},
+                                                    {"PowOp": {"val": "^"}},
+                                                    {"IntLiteral": {"val": 2}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {"IntLiteral": {"val": 3}},
+                            {
+                                "VarAssign": {
+                                    "is_global": "False",
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}},
+                                        {
+                                            "Expr": {
+                                                "sub_nodes": [
+                                                    {"IntLiteral": {"val": 45454}},
+                                                    {"AddOp": {"val": "+"}},
+                                                    {"Identifier": {"name": "x"}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "VarAssign": {
+                                    "is_global": "False",
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}},
+                                        {"StrLiteral": {"val": "valid case not found"}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_switch_case_just_default": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "SwitchCase": {
+                        "sub_nodes": [
+                            {"Identifier": {"name": "x"}},
+                            {
+                                "VarAssign": {
+                                    "is_global": "False",
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}},
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "x"}},
+                                                    {"PowOp": {"val": "^"}},
+                                                    {"IntLiteral": {"val": 2}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_switch_case_no_default": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "SwitchCase": {
+                        "sub_nodes": [
+                            { "Identifier": {"name": "x"}},
+                            { "IntLiteral": {"val": 3444}},
+                            {
+                                "VarAssign": {
+                                    "is_global": "False",
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}},
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "x"}},
+                                                    {"PowOp": {"val": "^"}},
+                                                    {
+                                                        "Term": {
+                                                            "sub_nodes": [
+                                                                {"IntLiteral": {"val": 1}},
+                                                                {"MulOp": {"val": "/"}},
+                                                                {"IntLiteral": {"val": 2}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_mixed_loops_and_ifs": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "x"}},
+                            {"IntLiteral": {"val": 0}}
+                        ]
+                    }
+                },
+                {
+                    "IfElse": {
+                        "sub_nodes": [
+                            {
+                                "Factor": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}},
+                                        {"PowOp": {"val": "=="}},
+                                        {"IntLiteral": {"val": 0}}
+                                    ]
+                                }
+                            },
+                            {
+                                "ForLoop": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "i"}},
+                                        {"IntLiteral": {"val": 0}},
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    {"IntLiteral": {"val": 1000}},
+                                                    {"PowOp": {"val": "^"}},
+                                                    {"Identifier": {"name": "y"}}
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "VarAssign": {
+                                                "is_global": "False",
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "x"}},
+                                                    {
+                                                        "Factor": {
+                                                            "sub_nodes": [
+                                                                {
+                                                                    "Expr": {
+                                                                        "sub_nodes": [
+                                                                            {"Identifier": {"name": "x"}},
+                                                                            {"AddOp": {"val": "+"}},
+                                                                            {"Identifier": {"name": "i"}}
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {"PowOp": {"val": "^"}},
+                                                                {"IntLiteral": {"val": 2}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "Factor": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}},
+                                        {"PowOp": {"val": "=="}},
+                                        {
+                                            "AddrExpr": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "k"}},
+                                                    {
+                                                        "AddrMember": {
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "z"}},
+                                                                {"IntLiteral": {"val": 3}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "DoUntil": {
+                                    "sub_nodes": [
+                                        {
+                                            "InnerInstrBlock": {
+                                                "sub_nodes": [
+                                                    {
+                                                        "VarAssign": {
+                                                            "is_global": "False",
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "j"}},
+                                                                {"IntLiteral": {"val": 0}}
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "WhileLoop": {
+                                                            "sub_nodes": [
+                                                                {
+                                                                    "Factor": {
+                                                                        "sub_nodes": [
+                                                                            {"Identifier": {"name": "j"}},
+                                                                            {"PowOp": {"val": "<="}},
+                                                                            {
+                                                                                "Term": {
+                                                                                    "sub_nodes": [
+                                                                                        {"Identifier": {"name": "y"}},
+                                                                                        {"MulOp": {"val": "MOD"}},
+                                                                                        {"IntLiteral": {"val": 3}}
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "InnerInstrBlock": {
+                                                                        "sub_nodes": [
+                                                                            {
+                                                                                "VarAssign": {
+                                                                                    "is_global": "False",
+                                                                                    "sub_nodes": [
+                                                                                        {
+                                                                                            "AddrExpr": {
+                                                                                                "sub_nodes": [
+                                                                                                    {"Identifier": {"name": "k"}},
+                                                                                                    {
+                                                                                                        "AddrMember": {
+                                                                                                            "sub_nodes": [
+                                                                                                                {"Identifier": {"name": "z"}},
+                                                                                                                {"Identifier": {"name": "j"}}
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        },
+                                                                                        {
+                                                                                            "Term": {
+                                                                                                "sub_nodes": [
+                                                                                                    {"Identifier": {"name": "y"}},
+                                                                                                    {"MulOp": {"val": "DIV"}},
+                                                                                                    {"Identifier": {"name": "j"}}
+                                                                                                ]
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "VarAssign": {
+                                                                                    "is_global": "False",
+                                                                                    "sub_nodes": [
+                                                                                        {"Identifier": {"name": "j"}},
+                                                                                        {
+                                                                                            "Expr": {
+                                                                                                "sub_nodes": [
+                                                                                                    {"Identifier": {"name": "j"}},
+                                                                                                    {"AddOp": {"val": "+"}},
+                                                                                                    {"IntLiteral": {"val": 1}}
+                                                                                                ]
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "x"}},
+                                                    {"PowOp": {"val": "!="}},
+                                                    {
+                                                        "AddrExpr": {
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "k"}},
+                                                                {
+                                                                    "AddrMember": {
+                                                                        "sub_nodes": [
+                                                                            {"Identifier": {"name": "z"}},
+                                                                            {"IntLiteral": {"val": 3}}
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_print": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "PrintInstr": {
+                        "sub_nodes": [
+                            { "Identifier": { "name": "x" } },
+                            { "Identifier": { "name": "y" } },
+                            {
+                                "Expr": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "x" } },
+                                        { "AddOp": { "val": "+" } },
+                                        { "IntLiteral": { "val": 2 } }
+                                    ]
+                                }
+                            },
+                            {
+                                "Expr": {
+                                    "sub_nodes": [
+                                        {
+                                            "Factor": {
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "x" } },
+                                                    { "PowOp": { "val": "^" } },
+                                                    { "IntLiteral": { "val": 2 } }
+                                                ]
+                                            }
+                                        },
+                                        { "AddOp": { "val": "-" } },
+                                        { "IntLiteral": { "val": 2 } }
+                                    ]
+                                }
+                            },
+                            {
+                                "AddrIdOrCall": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "f" } },
+                                        {
+                                            "AddrExpr": {
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "z" } },
+                                                    {
+                                                        "AddrMember": {
+                                                            "sub_nodes": [
+                                                                { "Identifier": { "name": "a" } },
+                                                                { "IntLiteral": { "val": 3}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "AddrExpr": {
+                                    "sub_nodes": [
+                                        { "Identifier": { "name": "b" } },
+                                        { "Identifier": { "name": "l" } },
+                                        { "Identifier": { "name": "y" } }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_fun_decl": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "FunDecl": {
+                        "sub_nodes": [
+                            { "Identifier": {"name": "sum" } },
+                            {
+                                "ParamList": {
+                                    "sub_nodes": [
+                                        {"Param": {"is_byref": "False", "name": "a"}},
+                                        {"Param": {"is_byref": "False", "name": "b"}},
+                                        {"Param": { "is_byref": "False", "name": "c"}}
+                                    ]
+                                }
+                            },
+                            {
+                                "ReturnInstr": {
+                                    "sub_nodes": [
+                                        {
+                                            "Expr": {
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "a" } },
+                                                    { "AddOp": { "val": "+" } },
+                                                    { "Identifier": { "name": "b" } },
+                                                    { "AddOp": { "val": "+" } },
+                                                    { "Identifier": { "name": "c" } }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_fun_decl_long_block": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "FunDecl": {
+                        "sub_nodes": [
+                            { "Identifier": { "name": "complex_func" } },
+                            {
+                                "ParamList": {
+                                    "sub_nodes": [
+                                        { "Param": { "is_byref": "False", "name": "a"}},
+                                        { "Param": { "is_byref": "False", "name": "b"}},
+                                        { "Param": { "is_byref": "False", "name": "c"}},
+                                        { "Param": { "is_byref": "False", "name": "d"}}
+                                    ]
+                                }
+                            },
+                            {
+                                "FunInstrBlock": {
+                                    "sub_nodes": [
+                                        {
+                                            "ForLoop": {
+                                                "sub_nodes": [
+                                                    { "Identifier": { "name": "i" } },
+                                                    { "IntLiteral": { "val": 0 } },
+                                                    { "Identifier": { "name": "a" } },
+                                                    {
+                                                        "InnerInstrBlock": {
+                                                            "sub_nodes": [
+                                                                {
+                                                                    "VarAssign": {
+                                                                        "is_global": "False",
+                                                                        "sub_nodes": [
+                                                                            { "Identifier": {"name": "a"}},
+                                                                            {
+                                                                                "Term": {
+                                                                                    "sub_nodes": [
+                                                                                        { "Identifier": { "name": "a" } },
+                                                                                        { "MulOp": { "val": "DIV" } },
+                                                                                        { "Identifier": { "name": "b" } },
+                                                                                        { "MulOp": { "val": "MOD" } },
+                                                                                        {
+                                                                                            "Factor": {
+                                                                                                "sub_nodes": [
+                                                                                                    { "Identifier": { "name": "c" } },
+                                                                                                    { "PowOp": { "val": "^" } },
+                                                                                                    { "Identifier": { "name": "d" } }
+                                                                                                ]
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "VarAssign": {
+                                                                        "is_global": "False",
+                                                                        "sub_nodes": [
+                                                                            { "Identifier": {"name": "b"}},
+                                                                            {
+                                                                                "Expr": {
+                                                                                    "sub_nodes": [
+                                                                                        { "Identifier": {"name": "b"}},
+                                                                                        { "AddOp": {"val": "+"}},
+                                                                                        { "IntLiteral": {"val": 1}}
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "IfElse": {
+                                                                        "sub_nodes": [
+                                                                            {
+                                                                                "Factor": {
+                                                                                    "sub_nodes": [
+                                                                                        { "Identifier": {"name": "a"}},
+                                                                                        { "PowOp": {"val": "<"}},
+                                                                                        { "Identifier": {"name": "b"}}
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "InnerInstrBlock": {
+                                                                                    "sub_nodes": [
+                                                                                        {
+                                                                                            "VarAssign": {
+                                                                                                "is_global": "False",
+                                                                                                "sub_nodes": [
+                                                                                                    { "Identifier": {"name": "a"}},
+                                                                                                    {
+                                                                                                        "Expr": {
+                                                                                                            "sub_nodes": [
+                                                                                                                {"Identifier": {"name": "a"}},
+                                                                                                                {"AddOp": {"val": "+"}},
+                                                                                                                {"IntLiteral": {"val": 1}}
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        },
+                                                                                        {
+                                                                                            "VarAssign": {
+                                                                                                "is_global": "False",
+                                                                                                "sub_nodes": [
+                                                                                                    { "Identifier": {"name": "c"}},
+                                                                                                    {
+                                                                                                        "Term": {
+                                                                                                            "sub_nodes": [
+                                                                                                                {"Identifier": {"name": "c"}},
+                                                                                                                {"MulOp": {"val": "DIV"}},
+                                                                                                                {"IntLiteral": {"val": 2}}
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "Factor": {
+                                                                                    "sub_nodes": [
+                                                                                        {"Identifier": {"name": "a"}},
+                                                                                        {"PowOp": {"val": "=="}},
+                                                                                        {"Identifier": {"name": "b"}}
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "DoUntil": {
+                                                                                    "sub_nodes": [
+                                                                                        {
+                                                                                            "VarAssign": {
+                                                                                                "is_global": "False",
+                                                                                                "sub_nodes": [
+                                                                                                    {"Identifier": {"name": "c"}},
+                                                                                                    {
+                                                                                                        "Term": {
+                                                                                                            "sub_nodes": [
+                                                                                                                {"Identifier": {"name": "c"}},
+                                                                                                                {"MulOp": {"val": "MOD"}},
+                                                                                                                {"Identifier": {"name": "d"}}
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        },
+                                                                                        {
+                                                                                            "Factor": {
+                                                                                                "sub_nodes": [
+                                                                                                    {"Identifier": {"name": "c"}},
+                                                                                                    {"PowOp": {"val": "=="}},
+                                                                                                    {"Identifier": {"name": "a"}}
+                                                                                                ]
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            },
+                                                                            {"GoToInstr": {"val": "break"}}
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "ReturnInstr": {
+                                                "sub_nodes": [
+                                                    {
+                                                        "Expr": {
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "a"}},
+                                                                {"AddOp": {"val": "+"}},
+                                                                {"Identifier": {"name": "b"}},
+                                                                {"AddOp": {"val": "+"}},
+                                                                {"Identifier": {"name": "c"}},
+                                                                {"AddOp": {"val": "+"}},
+                                                                {"Identifier": {"name": "d"}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_fun_decl_ref_types": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "FunDecl": {
+                        "sub_nodes": [
+                            { "Identifier": { "name": "f"}},
+                            {
+                                "ParamList": {
+                                    "sub_nodes": [
+                                        {"Param": {"is_byref": "True", "name": "a"}},
+                                        {"Param": {"is_byref": "False", "name": "b"}},
+                                        {"Param": {"is_byref": "False", "name": "c"}}
+                                    ]
+                                }
+                            },
+                            {
+                                "ReturnInstr": {
+                                    "sub_nodes": [
+                                        {
+                                            "Term": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "a"}},
+                                                    {"MulOp": {"val": "*"}},
+                                                    {"Identifier": {"name": "b"}},
+                                                    {"MulOp": {"val": "*"}},
+                                                    {"Identifier": {"name": "c"}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_fun_call_no_assign": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "AddrIdOrCall": {
+                        "sub_nodes": [
+                            {"Identifier": {"name": "f"}},
+                            {"CallableSuffix": {}}
+                        ]
+                    }
+                },
+                {
+                    "AddrExpr": {
+                        "sub_nodes": [
+                            {"Identifier": {"name": "a"}},
+                            {"Identifier": {"name": "b"}},
+                            {"Identifier": {"name": "c"}},
+                            {
+                                "AddrIdOrCall": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "d"}},
+                                        {"CallableSuffix": {}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "AddrExpr": {
+                        "sub_nodes": [
+                            {"Identifier": {"name": "a"}},
+                            {"Identifier": {"name": "b"}},
+                            {"Identifier": {"name": "c"}},
+                            {
+                                "AddrIdOrCall": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "d"}},
+                                        {
+                                            "ExprList": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "e"}},
+                                                    {
+                                                        "AddrMember": {
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "f"}},
+                                                                {"Identifier": {"name": "g"}}
+                                                            ]
+                                                        }
+                                                    },
+                                                    {"Identifier": {"name": "h"}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "AddrExpr": {
+                        "sub_nodes": [
+                            {"Identifier": {"name": "a"}},
+                            {
+                                "AddrIdOrCall": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "b"}},
+                                        {
+                                            "ExprList": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "c"}},
+                                                    {"Identifier": {"name": "d"}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {"Identifier": {"name": "e"}},
+                            {
+                                "AddrIdOrCall": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "f"}},
+                                        {
+                                            "ExprList": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "g"}},
+                                                    {
+                                                        "AddrMember": {
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "h"}},
+                                                                {"Identifier": {"name": "i"}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_fun_call_in_assign": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "x"}},
+                            {
+                                "AddrIdOrCall": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "f"}},
+                                        {"CallableSuffix": {}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "VarAssign": {
+                        "is_global": "True",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "y"}},
+                            {
+                                "AddrExpr": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "obj1"}},
+                                        {"Identifier": {"name": "obj2"}},
+                                        {
+                                            "AddrIdOrCall": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "f1"}},
+                                                    {
+                                                        "ExprList": {
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "a"}},
+                                                                {"Identifier": {"name": "b"}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {"Identifier": {"name": "obj3"}},
+                                        {
+                                            "AddrIdOrCall": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "f2"}},
+                                                    {
+                                                        "ExprList": {
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "c"}},
+                                                                {"Identifier": {"name": "d"}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_proc_decl": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "ProcDecl": {
+                        "sub_nodes": [
+                            {"Identifier": {"name": "sum"}},
+                            {
+                                "ParamList": {
+                                    "sub_nodes": [
+                                        {"Param": {"is_byref": "True", "name": "a"}},
+                                        {"Param": {"is_byref": "False", "name": "b"}},
+                                        {"Param": {"is_byref": "False", "name": "c"}}
+                                    ]
+                                }
+                            },
+                            {
+                                "ProcInstrBlock": {
+                                    "sub_nodes": [
+                                        {
+                                            "VarAssign": {
+                                                "is_global": "True",
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "result"}},
+                                                    {
+                                                        "Expr": {
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "a"}},
+                                                                {"AddOp": {"val": "+"}},
+                                                                {"Identifier": {"name": "b"}},
+                                                                {"AddOp": {"val": "+"}},
+                                                                {"Identifier": {"name": "c"}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        },
+                                        {"ReturnInstr": {}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_fun_expr": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "a"}},
+                            {
+                                "CastInt": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "b"}},
+                            {
+                                "CastFloat": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "y"}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "c"}},
+                            {
+                                "CastStr": {
+                                    "sub_nodes": [
+                                        {
+                                            "AddrExpr": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "x"}},
+                                                    {"Identifier": {"name": "y"}},
+                                                    {"Identifier": {"name": "z"}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "d"}},
+                            {
+                                "Input": {
+                                    "sub_nodes": [
+                                        { "StrLiteral": {"val": "Enter a value here: "}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_nested_fun_expr": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {
+                                "AddrExpr": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}},
+                                        {
+                                            "AddrMember": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "y"}},
+                                                    {"IntLiteral": {"val": 0}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "CastInt": {
+                                    "sub_nodes": [
+                                        {
+                                            "Expr": {
+                                                "sub_nodes": [
+                                                    {
+                                                        "AddrExpr": {
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "a"}},
+                                                                {"Identifier": {"name": "b"}}
+                                                            ]
+                                                        }
+                                                    },
+                                                    {"AddOp": {"val": "+"}},
+                                                    {
+                                                        "CastStr": {
+                                                            "sub_nodes": [
+                                                                {
+                                                                    "CastFloat": {
+                                                                        "sub_nodes": [
+                                                                            {
+                                                                                "CastInt": {
+                                                                                    "sub_nodes": [
+                                                                                        {
+                                                                                            "CastStr": {
+                                                                                                "sub_nodes": [
+                                                                                                    {
+                                                                                                        "CastFloat": {
+                                                                                                            "sub_nodes": [
+                                                                                                                {
+                                                                                                                    "Input": {
+                                                                                                                        "sub_nodes": [
+                                                                                                                            {"StrLiteral": {"val": "Enter a number: "}}
+                                                                                                                        ]
+                                                                                                                    }
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_str_functions": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "PrintInstr": {
+                        "sub_nodes": [
+                            {
+                                "Length": {
+                                    "sub_nodes": [
+                                        {
+                                            "AddrExpr": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "x"}},
+                                                    {"Identifier": {"name": "y"}},
+                                                    {"Identifier": {"name": "z"}},
+                                                    {"Identifier": {"name": "s"}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "PrintInstr": {
+                        "sub_nodes": [
+                            {
+                                "StrSubstring": {
+                                    "sub_nodes": [
+                                        {"IntLiteral": {"val": 2}},
+                                        {"IntLiteral": {"val": 0}},
+                                        {
+                                            "AddrExpr": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "x"}},
+                                                    {"Identifier": {"name": "y"}},
+                                                    {
+                                                        "AddrMember": {
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "z"}},
+                                                                {"IntLiteral": {"val": 0}}
+                                                            ]
+                                                        }
+                                                    },
+                                                    {"Identifier": {"name": "s"}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_file_functions": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "x"}},
+                            {
+                                "OpenRead": {
+                                    "sub_nodes": [
+                                        { "StrLiteral": {"val": "filename.txt"}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "line"}},
+                            {
+                                "ReadLine": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "y"}},
+                            {
+                                "WriteLine": {
+                                    "sub_nodes": [
+                                        {
+                                            "Expr": {
+                                                "sub_nodes": [
+                                                    {"StrLiteral": {"val": "another"}},
+                                                    {"AddOp": {"val": "+"}},
+                                                    {"StrLiteral": {"val": " line"}}
+                                                ]
+                                            }
+                                        },
+                                        {"Identifier": {"name": "x"}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "z"}},
+                            {
+                                "EndOfFile": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "x"}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {
+                                "AddrExpr": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "a"}},
+                                        {"Identifier": {"name": "b"}}
+                                    ]
+                                }
+                            },
+                            {
+                                "OpenWrite": {
+                                    "sub_nodes": [
+                                        {"StrLiteral": {"val": "filename2.txt"}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "FileClose": {
+                        "sub_nodes": [
+                            {"Identifier": {"name": "x"}}
+                        ]
+                    }
+                },
+                {
+                    "FileClose": {
+                        "sub_nodes": [
+                            {
+                                "AddrExpr": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "a"}},
+                                        {"Identifier": {"name": "b"}}
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_class_decl_simple": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "ClassDecl": {
+                        "parent": null,
+                        "sub_nodes": [
+                            {"Identifier": {"name": "A"}},
+                            {
+                                "ClassMember": {
+                                    "is_public": "True",
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "__val"}}
+                                    ]
+                                }
+                            },
+                            {
+                                "ClassMember": {
+                                    "is_public": "True",
+                                    "sub_nodes": [
+                                        {
+                                            "ProcDecl": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "new"}},
+                                                    {
+                                                        "ParamList": {
+                                                            "sub_nodes": [
+                                                                {
+                                                                    "Param": {
+                                                                        "is_byref": "False",
+                                                                        "name": "val"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "VarAssign": {
+                                                            "is_global": "False",
+                                                            "sub_nodes": [
+                                                                {"Identifier": {"name": "__val"}},
+                                                                {"Identifier": {"name": "val"}}
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_class_decl_inherit": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "ClassDecl": {
+                        "parent": "A",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "B"}},
+                            {
+                                "ClassMember": {
+                                    "is_public": "False",
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "__val"}}
+                                    ]
+                                }
+                            },
+                            {
+                                "ClassMember": {
+                                    "is_public": "True",
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "val"}}
+                                    ]
+                                }
+                            },
+                            {
+                                "ClassMember": {
+                                    "is_public": "True",
+                                    "sub_nodes": [
+                                        {
+                                            "ProcDecl": {
+                                                "sub_nodes": [
+                                                    {"Identifier": {"name": "new"}},
+                                                    {
+                                                        "ParamList": {
+                                                            "sub_nodes": [
+                                                                {
+                                                                    "Param": {
+                                                                        "is_byref": "False",
+                                                                        "name": "v"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    },
+                                                    {
+                                                        "ProcInstrBlock": {
+                                                            "sub_nodes": [
+                                                                {
+                                                                    "AddrExpr": {
+                                                                        "sub_nodes": [
+                                                                            {"Identifier": {"name": "super"}},
+                                                                            {
+                                                                                "AddrIdOrCall": {
+                                                                                    "sub_nodes": [
+                                                                                        {"Identifier": {"name": "new"}},
+                                                                                        {"CallableSuffix": {}}
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "VarAssign": {
+                                                                        "is_global": "False",
+                                                                        "sub_nodes": [
+                                                                            {"Identifier": {"name": "val"}},
+                                                                            {"Identifier": {"name": "v"}}
+                                                                        ]
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test_class_instantiate": {
+        "Program": {
+            "sub_nodes": [
+                {
+                    "VarAssign": {
+                        "is_global": "False",
+                        "sub_nodes": [
+                            {"Identifier": {"name": "a"}},
+                            {
+                                "NewExpr": {
+                                    "sub_nodes": [
+                                        {"Identifier": {"name": "A"}},
+                                        {
+                                            "Expr": {
+                                                "sub_nodes": [
+                                                    {"StrLiteral": {"val": "a"}},
+                                                    {"AddOp": {"val": "+"}},
+                                                    {"StrLiteral": {"val": "b"}}
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "Term": {
+                                                "sub_nodes": [
+                                                    {
+                                                        "Factor": {
+                                                            "sub_nodes": [
+                                                                {"IntLiteral": {"val": 3}},
+                                                                {"PowOp": {"val": "^"}},
+                                                                {"IntLiteral": {"val": 2}}
+                                                            ]
+                                                        }
+                                                    },
+                                                    {"MulOp": {"val": "DIV"}},
+                                                    {"IntLiteral": {"val": 6}}
+                                                ]
+                                            }
+                                        },
+                                        {
+                                            "Term": {
+                                                "sub_nodes": [
+                                                    {"IntLiteral": {"val": 2}},
+                                                    {"MulOp": {"val": "/"}},
+                                                    {"IntLiteral": {"val": 5}}
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    "test": {}
+}
