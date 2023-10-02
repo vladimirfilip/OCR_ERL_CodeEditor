@@ -5,7 +5,6 @@ from ui.styles import GLOBAL_STYLES
 import interpreter
 
 
-# Subclass QMainWindow to customize your application's main window
 class CodeEditor(QWidget):
     TEMP_FILENAME: str = "t.txt"
 
@@ -15,6 +14,8 @@ class CodeEditor(QWidget):
         self.setLayout(self.layout)
         self.textbox_layout = QHBoxLayout()
         self.text_edit = InputTextBox(self)
+        self.text_edit.setFont(QtGui.QFont("Consolas"))
+        self.text_edit.setTabStopDistance(26)
         self.textbox_layout.addWidget(self.text_edit)
         self.layout.addLayout(self.textbox_layout)
         self.terminal = Terminal()
@@ -26,6 +27,7 @@ class CodeEditor(QWidget):
         self.run_btn.setFixedHeight(50)
         self.run_btn.clicked.connect(self.on_run_btn_click)
         self.run_btn.setIcon(QtGui.QIcon("ui\play.png"))
+        self.terminal.setFont(QtGui.QFont("Consolas"))
         self.terminal.on_run_start = lambda: self.run_btn.setIcon(QtGui.QIcon("ui\stop.png"))
         self.terminal.on_run_end = lambda: self.run_btn.setIcon(QtGui.QIcon("ui\play.png"))
         self.set_shadow(self.run_btn)

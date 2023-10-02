@@ -81,7 +81,7 @@ class Parser:
         if self.__token_is(TokenVals.GLOBAL):
             ctx[TokenVals.GLOBAL] = True
             self.__expect_next_token_on_same_line()
-            result = Parser.__tree_expect(ctx,
+            result = self.__tree_expect(ctx,
                                           self.__arr_or_var,
                                           "Syntax error: array or variable declaration expected")
         return result
@@ -101,7 +101,7 @@ class Parser:
             name: str = self.__token_expect(TokenVals.ID, same_line=True)
             result = ArrayDecl(self.curr_line_index, is_global).set_name(name)
             self.__token_must_be(TokenContents.OPEN_BRACKET, TokenVals.OPEN_BRACKET, same_line=True)
-            result.set_dims(Parser.__tree_expect(ctx,
+            result.set_dims(self.__tree_expect(ctx,
                                                  self.__expr_list,
                                                  "Syntax error: list of expressions expected"))
             self.__token_must_be(TokenContents.CLOSED_BRACKET, TokenVals.CLOSED_BRACKET)
