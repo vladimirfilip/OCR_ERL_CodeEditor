@@ -419,6 +419,8 @@ class AstExecutor:
             if ctx.break_detected:
                 ctx.break_detected = False
                 break
+            if ctx.return_detected:
+                break
         ctx.inside_loop = in_outer_loop
 
     def __execute_do_until_loop(self, do_until: DoUntil, ctx: ExeCtx):
@@ -441,6 +443,8 @@ class AstExecutor:
                 ctx.continue_detected = False
             if ctx.break_detected:
                 ctx.break_detected = False
+                break
+            if ctx.return_detected:
                 break
             evaluated_condition: T = self.__eval(condition, ctx)
             if type(evaluated_condition) != bool:
@@ -465,6 +469,8 @@ class AstExecutor:
                 ctx.continue_detected = False
             if ctx.break_detected:
                 ctx.break_detected = False
+                break
+            if ctx.return_detected:
                 break
             #
             # Break continuous execution of block if condition evaluates to false
@@ -1040,7 +1046,7 @@ class AstExecutor:
         suffix: str = "ed" if post else "ing"
         ending: str = "." if post else " ..."
         ending = f": {result}{ending}" if result else ending
-        logging.debug(f"{prefix}{suffix} node {node.__class__.__name__}{ending}")
+        logging.debug(f"{prefix}{suffix} node {node.__class__.__name__} at line {node.line_index}: {ending}")
 
     def __raise_error(self, nodes: list[Node], e: Exception):
         if self.on_error is not None:
