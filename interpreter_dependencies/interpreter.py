@@ -1,10 +1,13 @@
+import json
 from typing import Iterable, Iterator
 from sys import argv, stderr
 from time import time
-from interpreter_dependencies.ast_executor import AstExecutor
-from interpreter_dependencies.lexer import Lexer
-from interpreter_dependencies.parser import Parser
-from interpreter_dependencies.tokenizer import Tokenizer
+from ast_executor import AstExecutor
+from interpreter_dependencies.parsed_ast import Node
+from lexer import Lexer
+from parser import Parser
+from tokenizer import Tokenizer
+from ast_to_json import ASTToJsonParser
 import logging
 
 
@@ -23,7 +26,7 @@ class Interpreter:
         self.__executor.execute()
 
     def on_error(self, e: Exception, source_code_indices: list[int], post_parse: bool):
-        heading = f"Error found:" if not post_parse else f"Error during execution:"
+        heading = f"Error in parsing:" if not post_parse else f"Error during execution:"
         code_snippet = self.get_formatted_source_code_lines(source_code_indices)
         ex_msg = f"{e.__class__.__name__}: {str(e)}"
         whole_msg = [heading] + code_snippet + [ex_msg]
@@ -36,12 +39,14 @@ class Interpreter:
         stderr.flush()
         exit(-1)
 
-    def on_parse_finish(self):
+    def on_parse_finish(self, ast_node: Node):
         logging.debug(f" ### FINISHED PARSING IN {time() - self.parse_begin_time} seconds ###")
         logging.debug(f"COMPLETE SOURCE CODE")
         formatted_source_code = self.get_formatted_source_code_lines(list(range(len(self.source_code))))
         for line in formatted_source_code:
             logging.debug(line)
+        ast_json = ASTToJsonParser().parse(ast_node)
+        logging.debug(json.dumps(ast_json, indent=4))
 
     def on_parse_begin(self):
         self.parse_begin_time = time()

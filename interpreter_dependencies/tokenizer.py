@@ -1,6 +1,6 @@
 from typing import Iterator, ClassVar, Iterable, Tuple, Optional, Callable
 
-from .parsed_token import TokenVals, ParsedToken, KNOWN_CONTENTS_DESC
+from parsed_token import TokenVals, ParsedToken, KNOWN_CONTENTS_DESC
 
 
 class Tokenizer:

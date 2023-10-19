@@ -3,13 +3,13 @@ import logging
 import os
 from time import time_ns
 from typing import Callable, Type, Dict, TypeVar, Optional, List, Tuple
-from .parsed_ast import Node, Program, VarAssign, Identifier, IntLiteral, ArrayDecl, AddrMember, ExprList, \
+from parsed_ast import Node, Program, VarAssign, Identifier, IntLiteral, ArrayDecl, AddrMember, ExprList, \
     Expr, Term, Factor, UnaryMinus, IfElse, UnaryNot, SwitchCase, ForLoop, GoToInstr, InnerInstrBlock, DoUntil, \
     WhileLoop, StrLiteral, NumLiteral, PrintInstr, FunDecl, AddrIdOrCall, Param, ReturnInstr, FunInstrBlock, CallableSuffix, ProcDecl, ProcInstrBlock, CastStr, CastInt, CastFloat, Length, StrSubstring, Input, EndOfFile, \
     ReadLine, WriteLine, FileClose, OpenRead, OpenWrite, ClassDecl, NewExpr, AddrExpr, ClassMember, AttrDecl, BoolLiteral
-from .parsed_token import TokenVals, KNOWN_TOKEN_VALS, TokenContents
-from .parser import Parser
-from .sym_table import V, SymTable, ArrayVal, SymAddr, NullVal, ObjSymTable
+from parsed_token import TokenVals, KNOWN_TOKEN_VALS, TokenContents
+from parser import Parser
+from sym_table import V, SymTable, ArrayVal, SymAddr, NullVal, ObjSymTable
 from io import TextIOWrapper
 
 T = TypeVar("T")
@@ -678,7 +678,7 @@ class AstExecutor:
             c: ClassDecl = stack.pop()
             members: list[ClassMember] = c.sub_nodes[1:]
             class_name: str = c.sub_nodes[0].name
-            obj = ObjSymTable(parent, self.get_instance_key(class_name))
+            obj = ObjSymTable(parent, self.get_instance_key(class_name), class_name)
             #
             # sets the cur_table and outer_class fields of context to the current object as the values of some fields may use the values of other fields when they are first declared
             #

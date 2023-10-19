@@ -1,14 +1,14 @@
 from typing import Optional, Callable
 from time import time
 import logging
-from .parsed_ast import Node, Program, ProgramBlock, InstrBlock, Instr, ArrayDecl, VarAssign, AddrInstr, \
+from parsed_ast import Node, Program, ProgramBlock, InstrBlock, Instr, ArrayDecl, VarAssign, AddrInstr, \
     AddrExpr, AddrAssign, Identifier, AddrMember, IndexingSuffix, ExprList, Expr, Term, Factor, SimpleExpr, \
     CallableSuffix, IntLiteral, AddrIdOrCall, AddOp, MulOp, UnaryMinus, UnaryNot, PowOp, IfElse, ElseIf, \
     InnerInstrBlock, GoToInstr, SwitchCase, ForLoop, WhileLoop, DoUntil, StrLiteral, NumLiteral, PrintInstr, \
     BuiltInFunCall, FunDecl, ParamList, Param, FunInstrBlock, ReturnInstr, ProcDecl, ProcInstrBlock, FunExpr, CastStr, CastInt, CastFloat, Input, Length, StrSubstring, ClassDecl, ClassBlock, ClassMember, AttrDecl, \
     EndOfFile, ReadLine, WriteLine, FileClose, OpenRead, OpenWrite, NewExpr, BoolLiteral
-from .lexer import Lexer
-from .parsed_token import TokenVals, ParsedToken, TokenContents
+from lexer import Lexer
+from parsed_token import TokenVals, ParsedToken, TokenContents
 
 
 class Parser:
@@ -30,7 +30,7 @@ class Parser:
             self.curr_line_index = next_token.line_index
             self.__raise_error(SyntaxError(f"Unexpected '{next_token.text}'"))
         if self.on_parse_finish is not None:
-            self.on_parse_finish()
+            self.on_parse_finish(result)
         return result
 
     def __program(self, ctx: dict) -> Optional[Program]:

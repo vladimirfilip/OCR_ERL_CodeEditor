@@ -39,10 +39,11 @@ class Terminal(QtWidgets.QPlainTextEdit):
 
     def run(self, *args):
         self.process = QtCore.QProcess(self)
-        self.process.setProgram(sys.executable)
+        program, rest_args = args[0], args[1:]
+        self.process.setProgram(program)
         self.process.readyReadStandardOutput.connect(self.on_ready_read_std_output)
         self.process.readyReadStandardError.connect(self.on_ready_read_std_err)
-        self.process.setArguments(args)
+        self.process.setArguments(rest_args)
         self.process.start()
         self.process.finished.connect(self.on_process_end)
         self.setReadOnly(False)

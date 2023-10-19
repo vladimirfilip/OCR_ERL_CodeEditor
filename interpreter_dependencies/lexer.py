@@ -1,6 +1,6 @@
 from typing import Optional, Iterator, Iterable
-from .parsed_token import ParsedToken
-from .tokenizer import TokenVals, Tokenizer
+from parsed_token import ParsedToken
+from tokenizer import TokenVals, Tokenizer
 
 
 class Lexer:

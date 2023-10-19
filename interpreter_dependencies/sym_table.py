@@ -1,9 +1,7 @@
 import io
-from time import time_ns
-from typing import Dict, TypeVar, Optional, Iterable, Tuple, Callable
+from typing import Dict, TypeVar, Optional, Iterable, Tuple, Iterator
 
-from .parsed_ast import ClassDecl
-from .parsed_token import TokenContents
+from parsed_token import TokenContents
 
 V = TypeVar("V")
 
@@ -232,6 +230,13 @@ class SymAddr:
                 return self.__indexes[dim]
             raise IndexError(f"Index out of bounds: {dim} (negative or not less than {self.dims})")
         raise RuntimeError("Illegal to get index from non-dimensional address")
+
+    def __str__(self) -> str:
+        try:
+            value = self.value
+        except ValueError:
+            value = None
+        return f"Address to {self.name}" + f" of value {value}" if value is not None else " of null value"
 
 
 class SymRef(SymAddr):
@@ -525,8 +530,9 @@ class SymTable(Dict[str, V]):
 
 
 class ObjSymTable(SymTable):
-    def __init__(self, parent: SymTable, storage_key: str):
+    def __init__(self, parent: SymTable, storage_key: str, class_name: str):
         super().__init__(parent)
+        self.class_name = class_name
         self.STORAGE_KEY = storage_key
         self.public_symbols = []
         if isinstance(parent, ObjSymTable):
@@ -553,3 +559,13 @@ class ObjSymTable(SymTable):
 
     def is_symbol_public(self, name: str) -> bool:
         return name in self.public_symbols
+
+    def get_fields(self) -> Iterator[tuple[str, V]]:
+        for k, v in self.items():
+            yield k, v
+        if isinstance(self.parent, ObjSymTable):
+            for k, v in self.parent.get_fields():
+                yield k, v
+
+    def __str__(self) -> str:
+        return "<Instance of '{}': {}>".format(self.class_name, '{' + ", ".join(f"{str(k)}: {str(v)}" for k, v in self.get_fields()) + '}')

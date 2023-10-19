@@ -1,8 +1,10 @@
+import sys
+
 from PyQt6 import QtGui
-from PyQt6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTextEdit, QPlainTextEdit, QGraphicsDropShadowEffect
+from PyQt6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QGraphicsDropShadowEffect
 from ui.components import InputTextBox, Terminal
 from ui.styles import GLOBAL_STYLES
-import interpreter
+from tkinter import filedialog
 
 
 class CodeEditor(QWidget):
@@ -10,6 +12,7 @@ class CodeEditor(QWidget):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.interpreter_path = ""
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
         self.textbox_layout = QHBoxLayout()
@@ -30,15 +33,16 @@ class CodeEditor(QWidget):
         self.terminal.setFont(QtGui.QFont("Consolas"))
         self.terminal.on_run_start = lambda: self.run_btn.setIcon(QtGui.QIcon("ui\stop.png"))
         self.terminal.on_run_end = lambda: self.run_btn.setIcon(QtGui.QIcon("ui\play.png"))
-        self.set_shadow(self.run_btn)
-        self.set_shadow(self.text_edit)
-        self.set_shadow(self.terminal)
+        CodeEditor.add_drop_shadow(self.run_btn)
+        CodeEditor.add_drop_shadow(self.text_edit)
+        CodeEditor.add_drop_shadow(self.terminal)
         self.btn_layout.addWidget(self.run_btn)
         self.btn_layout.addStretch()
         self.layout.addLayout(self.btn_layout)
         self.setStyleSheet(GLOBAL_STYLES)
 
-    def set_shadow(self, widget: QWidget):
+    @staticmethod
+    def add_drop_shadow(widget: QWidget):
         drop_shadow = QGraphicsDropShadowEffect()
         drop_shadow.setColor(QtGui.QColor("#ddd"))
         drop_shadow.setXOffset(0)
@@ -57,4 +61,10 @@ class CodeEditor(QWidget):
             file.write(self.text_edit.text)
         self.terminal.clear()
         self.terminal.setFocus()
-        self.terminal.run(interpreter.__file__, "t.txt")
+        if not self.interpreter_path:
+            self.interpreter_path = filedialog.askopenfilename()
+        if self.interpreter_path.split(".")[-1] == "py":
+            run_args = (sys.executable, self.interpreter_path, CodeEditor.TEMP_FILENAME)
+        else:
+            run_args = (self.interpreter_path, CodeEditor.TEMP_FILENAME)
+        self.terminal.run(*run_args)
