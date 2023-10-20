@@ -235,7 +235,7 @@ KNOWN_TOKENS = {
     TokenContents.FALSE: TokenVals.FALSE,
 }
 KNOWN_CONTENTS_DESC = sorted(KNOWN_TOKENS.keys(), key=lambda c: len(c.value), reverse=True)
-KNOWN_TOKEN_VALS = { v: k for k, v in KNOWN_TOKENS.items() }
+KNOWN_TOKEN_VALS = {v: k for k, v in KNOWN_TOKENS.items()}
 
 #
 # If a known token consists of alphanumeric characters then it could be part of an identifier
