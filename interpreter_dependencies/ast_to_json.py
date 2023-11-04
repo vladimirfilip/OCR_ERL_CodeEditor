@@ -1,6 +1,5 @@
 from typing import Type, Callable
 from parsed_ast import Node, GlobDecl, ArrayDecl, Identifier, IntLiteral, StrLiteral, NumLiteral, BoolLiteral, Op, GoToInstr, Param, ClassDecl, ClassMember
-import parsed_ast
 from parsed_token import KNOWN_TOKEN_VALS
 
 
