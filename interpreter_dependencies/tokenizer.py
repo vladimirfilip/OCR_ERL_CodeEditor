@@ -18,7 +18,7 @@ class Tokenizer:
         self.on_new_line_input = on_new_line_input
 
     def tokenize(self, lines: Iterable[str]) -> Iterator[ParsedToken]:
-        """Converts an iterator of lines into an iterator of tokens.
+        """Converts an iterable of lines into an iterator of tokens.
 
         :param lines: succession of lines.
         :return: succession of tokens, up to comment delimiter.
@@ -53,12 +53,24 @@ class Tokenizer:
         :return: iterator of chunks
         """
         str_pos: int = line.find(Tokenizer.__STR_SEP)
+        #
+        # If there is no string separator present, the line is checked for the presence of a comment symbol ('//')
+        # If a comment is found, the line up to the comment is returned and True to indicate that the chunk ended in a comment.
+        # If a comment is not found, the whole line is outputted as a chunk and False to indicate that there is comment
+        #
         if str_pos < 0:
             comment_pos: int = line.find(Tokenizer.__COMMENT)
             yield (line, False) if comment_pos < 0 else (line[:comment_pos], True)
+        #
+        # str_pos > 0 indicates that the line consists of a chunk that is not a string and a chunk that is a string, and so
+        # self.__chunks_with_non_str is called
+        #
         elif str_pos > 0:
             for chunk, with_comment in self.__chunks_with_non_str(line, str_pos):
                 yield chunk, with_comment
+        #
+        # str_pos == 0 indicates that the line starts with '"', and so self.__chunks_with_str is called
+        #
         elif str_pos == 0:
             for chunk, with_comment in self.__chunks_with_str(line):
                 yield chunk, with_comment
@@ -96,7 +108,7 @@ class Tokenizer:
         as "this is not closed).
 
         :param line: line whose front to split the string from.
-        :return: string in from of the line
+        :return: string from the front of the line
         """
         #
         # The resulted string must start with the string separator character
@@ -144,27 +156,25 @@ class Tokenizer:
         :param line: line to tokenize.
         :return: succession of tokens.
         """
-        for chunk in self.__str_chunks(line):
-            if chunk[0] and chunk[0][0] == Tokenizer.__STR_SEP:
+        for chunk, _ in self.__str_chunks(line):
+            if chunk and chunk[0] == Tokenizer.__STR_SEP:
                 #
                 # If a string, returns string literal token
                 # with text set to the chunk minus the '"' on both ends.
                 #
                 yield (ParsedToken(line_index=Tokenizer.CURRENT_LINE)
-                       .set_val(TokenVals.STRING).set_text(chunk[0][1:-1]))
+                       .set_val(TokenVals.STRING).set_text(chunk[1:-1]))
             else:
                 #
                 # Eliminate white spaces
                 #
-                for meta_token in chunk[0].split():
+                for meta_token in chunk.split():
                     #
                     # Split each sequence of non-whitespaces into recognized tokens of the language
                     #
                     for token in Tokenizer.__tokens(meta_token):
                         token.line_index = Tokenizer.CURRENT_LINE
                         yield token
-                if chunk[1]:
-                    break
 
     @staticmethod
     def __tokens(meta_token: str) -> Iterator[ParsedToken]:
@@ -190,7 +200,7 @@ class Tokenizer:
                 yield t
             else:
                 #
-                # Used to detect known tokens that to not start with an id beginning character, like '+', '-', 'global', etc
+                # Used to detect known tokens that do not start with an id beginning character, like '+', '-', etc
                 #
                 skip: bool = False
                 for known_content in KNOWN_CONTENTS_DESC:
@@ -207,7 +217,7 @@ class Tokenizer:
                 #
                 # Any other possibility gets rejected
                 #
-                raise SyntaxError("Unrecognized tokens: " + meta_token[i:])
+                raise SyntaxError("Unrecognized input: " + meta_token[i:])
 
     @staticmethod
     def __id_cond(first_char: str) -> bool:
@@ -216,18 +226,19 @@ class Tokenizer:
     @staticmethod
     def __id_token_or_known(first_char: str, meta_token: str, i: int) -> Tuple[ParsedToken, int]:
         #
-        # Identifiers start with alphabetical characters or underscores and continue with those as well as
-        # digits
+        # Valid identifiers start with alphabetical characters or underscores and continue with those as well as
+        # digits. Will therefore extract the largest possible substring such that these criteria are met
         #
-        token: str = first_char
+        text: str = first_char
         i += 1
         while i < len(meta_token) and (meta_token[i] == Tokenizer.__UNDERSCORE or meta_token[i].isalnum()):
-            token += meta_token[i]
+            text += meta_token[i]
             i += 1
         #
-        # set_val() set the token value to ID, but set_text() overrides that if the token is a known one
+        # set_val() set the token value to ID, but set_text() overrides that if the text matches that
+        # of a keyword or symbol in KNOWN_TOKENS
         #
-        return ParsedToken().set_val(TokenVals.ID).set_text(token), i
+        return ParsedToken().set_val(TokenVals.ID).set_text(text), i
 
     @staticmethod
     def __num_cond(first_char: str, second_char: str) -> bool:
@@ -249,6 +260,9 @@ class Tokenizer:
                 return False
             return True
 
+        #
+        # Extracts the longest possible substring out of meta_token such that the substring represents a valid number
+        #
         if first_char.isdigit():
             token_len = 1
         else:
@@ -259,5 +273,10 @@ class Tokenizer:
                 token_len += 1
             else:
                 break
-        val = TokenVals.INT if meta_token[i:i + token_len].isdigit() else TokenVals.NUM
-        return ParsedToken().set_val(val).set_text(meta_token[i:i + token_len]), i + token_len
+        text: str = meta_token[i:i + token_len]
+        #
+        # If the substring represents an int literal, the value of the new token should be TokenVals.INT
+        # If not, the value should be TokenVals.NUM
+        #
+        val = TokenVals.INT if text.isdigit() else TokenVals.NUM
+        return ParsedToken().set_val(val).set_text(text), i + token_len

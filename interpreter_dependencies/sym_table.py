@@ -305,7 +305,6 @@ class SymTable(Dict[str, V]):
     """
 
     parent: 'SymTable'
-    sub_tables: Dict[str, 'SymTable']
 
     def __init__(self, parent: 'SymTable' = None, init_symbols: Dict[str, V] = {}):
         """Initializes the symbol table.
@@ -319,7 +318,6 @@ class SymTable(Dict[str, V]):
         super().__init__()
         self.parent = parent
         self.__root = None
-        self.sub_tables = {}
         self.update_symbols(init_symbols)
 
     def __enter__(self):
@@ -332,10 +330,6 @@ class SymTable(Dict[str, V]):
         """Closes the object by removing circular references to parent and root symbol tables."""
         self.__root = None
         self.parent = None
-        if recursive:
-            for st in self.sub_tables.values():
-                sub_table: SymTable = st
-                sub_table.close(recursive)
         #
         # Closes any I/O streams present
         #
@@ -411,50 +405,6 @@ class SymTable(Dict[str, V]):
         self.update_symbols({n: None for n in names})
         return self
 
-    def sub_table_from(self, name: str, new_if_absent: bool = False) -> Optional['SymTable']:
-        """Gets the sub-table associated with the given key.
-
-        :param name: sub-table identifier.
-        :param new_if_absent: whether to create the sub-table if it doesn't exist. It defaults to False.
-        :return: the sub-table associated with the key, if any.
-        """
-        result: Optional['SymTable'] = self.sub_tables.get(name, None)
-        if result is None and new_if_absent:
-            result = SymTable(self)
-            self.sub_tables[name] = result
-        return result
-
-    def sub_table_of(self, names: Iterable[str] = []) -> Optional['SymTable']:
-        """Gets the sub-table corresponding to the given sequence of names.
-
-        :param names: sequence of names to lookup by. If empty then the function returns the current symbol table.
-        :return: symbol sub-table corresponding to the given sequence of names. None if the lookup breaks before reaching the end of the sequence.
-        """
-        result: 'SymTable' = self
-        for n in names:
-            result = result.sub_table_from(n)
-            if result is None:
-                break
-        return result
-
-    def clear_sub_table(self, name: str = None) -> Optional['SymTable'] | list['SymTable']:
-        """Removes the sub-table corresponding to the given identifying key.
-
-        This method also closes the cleared sub-table(s).
-
-        :param name: identifier for the sub-table to remove. If None, then all sub-tables get removed.
-        :return: the cleared sub-table(s)
-        """
-        if name:
-            result: SymTable = self.sub_tables.pop(name, None)
-            if result:
-                result.close()
-        else:
-            names: list[str] = list(self.sub_tables.keys())
-            result: list[SymTable] = [self.clear_sub_table(n) for n in names]
-            result = [t for t in result if t is not None]
-        return result
-
     def lookup_symbol(self, name: str, value_if_absent: V = None) -> Optional[V]:
         """Gets the value associated with a symbol or a sequence of symbols.
 
@@ -478,49 +428,6 @@ class SymTable(Dict[str, V]):
         while name not in sym_table and sym_table.parent is not None:
             sym_table = sym_table.parent
         return (sym_table.get(name), sym_table) if name in sym_table else None
-
-    def lookup_deep_symbol(self, names: Iterable[str], value_if_absent: V = None) -> Optional[V]:
-        """Gets the value associated with a complex symbol represented a sequence of symbols.
-
-        :param names: sequence of names to look the value up by. It may not be empty. Each symbol in the sequence but the last one determine the successive sub-tables to look
-                      up by.
-        :param value_if_absent: value to assign to the symbol if the name (or the last symbol in the sequence) cannot be found in its corresponding table. This parameter must
-                                not be None for the assignment to take effect.
-        :return: value associated with the symbol or sequence of symbols, if any.
-        """
-        name, tbl = self.__lookup_table(names=names)
-        if tbl is not None:
-            if name not in tbl and value_if_absent is not None:
-                tbl[name] = value_if_absent
-            return tbl.get(name, None)
-        return None
-
-    def update_deep_symbol(self, names: Iterable[str], val: V = None, strict: bool = False) -> bool:
-        """Updates the value associated with a complex symbol represented as a sequence of symbols.
-
-        :param names: sequence of names indicating the symbol (and its symbol table) to set the value for. It may not be empty. Each symbol in the sequence but the last one
-                      determine the successive sub-tables to lookup by.
-        :param val: value to assign to the symbol. If None then the symbol gets removed from its own table. If not None and the symbol does not exist, it gets created.
-        :param strict: True if the symbol's table must exist before assignment. This flag matters only if the lookup can't find the symbol table owning the symbol.
-        :return: True if the table for the symbol is found and the symbol was updated successfully. False if the there is no symbol table that may contain the symbol corresponding
-                 to the given name or sequence of names.
-        """
-        name, tbl = self.__lookup_table(names=names)
-        if tbl is not None:
-            tbl.update_symbol(name, val)
-            return True
-        if strict:
-            raise RuntimeError(f"Failed symbol(s) lookup: {TokenContents.DOT.value.join(names)}")
-        return False
-
-    def __lookup_table(self, name: str = None, names: Iterable[str] = []) -> Tuple[str, Optional['SymTable']]:
-        if name is not None:
-            return self.__lookup_table(names=[name])
-        name_list: list[str] = list(names)
-        if name_list:
-            return name_list[-1], self.sub_table_of(names=name_list[:-1])
-        else:
-            raise RuntimeError("No lookup symbol(s)")
 
     def is_symbol_public(self, name: str) -> bool:
         #

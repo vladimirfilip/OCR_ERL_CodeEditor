@@ -50,8 +50,8 @@ class TokenContents(Enum):
     PRINT = "print"
     FUNCTION = "function"
     ENDFUNCTION = "endfunction"
-    BYVAL = ":byVal"
-    BYREF = ":byRef"
+    BYVAL = "byVal"
+    BYREF = "byRef"
     RETURN = "return"
     PROCEDURE = "procedure"
     ENDPROCEDURE = "endprocedure"
@@ -254,8 +254,6 @@ for __t, __v in KNOWN_TOKENS.items():
 
 
 class ParsedToken:
-    TOKEN_NAMES: ClassVar[list[str]]
-
     __t_text: str
     __t_content: Optional[TokenContents]
     __t_val: TokenVals
@@ -329,6 +327,3 @@ class ParsedToken:
     def set_val(self, v: TokenVals) -> 'ParsedToken':
         self.val = v
         return self
-
-
-ParsedToken.TOKEN_NAMES = [__v.name for __v in TokenVals]

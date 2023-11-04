@@ -8,17 +8,18 @@ ProgramBlock -> InstrBlock
                 | ClassDecl
 
 InstrBlock -> Instr InstrBlock'
+
 InstrBlock' -> Instr InstrBlock' | ε
 
 ## Fun declarations
 
-FunDecl -> 'function' ID '(' ParamList ')' FunInstrBlock 'endfunction'
+FunDecl -> 'function' ID '(' ParamList ')' InnerInstrBlock 'endfunction'
 
 FunInstrBlock -> InnerInstr FunInstrBlock | ε
 
 ## Proc declarations
 
-ProcDecl -> 'procedure' ID '(' ParamList ')' ProcInstrBlock 'endprocedure'
+ProcDecl -> 'procedure' ID '(' ParamList ')' InnerInstrBlock 'endprocedure'
 
 ProcInstrBlock -> InnerInstr ProcInstrBlock | ε
 
@@ -46,22 +47,23 @@ MemberInit -> '=' Expr | ε
 
 ## Instructions
 
-Instr -> GlobDecl | ArrOrVar
+Instr -> GlobDecl | ArrayDecl | AddrInstr
          | IfElse | ForLoop | WhileLoop | DoUntil | SwitchCase
-         | ProcCall | FunCall
          | PrintInstr | ReturnInstr
 
-GlobDecl -> 'global' ArrOrVar | ε
+GlobDecl -> 'global' ArrOrVar
 
 ArrOrVar -> ArrayDecl | VarAssign
 
 ArrayDecl -> 'array' ID '[' ExprList ']'
 
-VarAssign -> LhsAddrExpr AddrAssign
+VarAssign -> AddrInstr // verify that AddrInstr is an assignment at runtime
 
 AddrAssign -> '=' Expr
 
-OptionalExprList -> ExprList | ε
+AddrInstr -> AddrExpr (AddrAssign | ε) // verify AddrExpr is a subroutine call if no AddrAssign present at runtime
+
+ReturnInstr -> 'return' (Expr | ε)
 
 ### Inner instructions
 
@@ -84,6 +86,7 @@ Else -> 'else' InnerInstrBlock
 SwitchCase -> 'switch' Expr ':' Cases Default 'endswitch'
 
 Cases -> Case Cases | ε
+
 Case -> 'case' Expr ':' InnerInstrBlock
 
 Default -> 'default' ':' InnerInstrBlock | ε
@@ -113,7 +116,7 @@ ParamList' -> ',' Param ParamList' | ε
 
 Param -> ID ParamPassing
 
-ParamPassing -> ':byRef' | ':byVal' | ε
+ParamPassing -> ':' ('byRef' | 'byVal') | ε
 
 ## Expressions
 
@@ -133,19 +136,13 @@ IndexingSuffix -> '[' ExprList ']' | ε
 
 CallableSuffix -> '(' OptionalExprList ')' | ε
 
-### Calls
-
-FunCall -> AddrInstr
-
-ProcCall -> AddrInstr // verify type at runtime
+### Operator expressions
 
 ExprList -> Expr ExprList'
 
 ExprList' -> ',' Expr ExprList' | ε
 
-
-
-### Operator expressions
+OptionalExprList -> ExprList | ε
 
 Expr -> Term Expr'
 
@@ -159,19 +156,25 @@ Factor -> SimpleExpr Factor'
 
 Factor' -> PowOp SimpleExpr Factor' | ε
 
-SimpleExpr -> '-' SimpleExpr
-        | 'NOT' SimpleExpr
+SimpleExpr -> UnaryNot
+        | UnaryMinus
         | '(' Expr ')'
         | AddrExpr
         | NewExpr
         | FunExpr
         | NUM | INT | STRING
+        | 'true' | 'false'
+
+UnaryNot -> 'NOT' SimpleExpr
+
+UnaryMinus -> '-' SimpleExpr
 
 NewExpr -> 'new' ID '(' ExprList ')'
 
+AddOp -> '+' | '-' | 'AND'
 
-AddOp -> '+' | '-' | 'AND'   
 MulOp -> '*' | '/' | 'OR' | 'MOD' | 'DIV'
+
 PowOp -> '^' | '==' | '>' | '>=' | '<' | '<=' | '!=' 
 
 ### Built-in functions
@@ -184,28 +187,34 @@ FunExpr -> CastInt
         | OpenWrite
 
 CastInt -> 'int' '(' Expr ')'
+
 CastString -> 'str' '(' Expr ')'
+
 CastFloat -> 'float' '(' Expr ')'
+
 Input -> 'input' '(' Expr ')'
+
 OpenRead -> 'openRead' '(' Expr ')'
+
 OpenWrite -> 'openWrite' '(' Expr ')'
 
-BuiltInAttribute -> AddrExpr '.' (StrLen 
-                                    | StrSubstring
-                                    | EndOfFile
-                                    | ReadLine
-                                    | WriteLine
-                                    | Close )
+BuiltInAttribute -> StrLen 
+                    | StrSubstring
+                    | EndOfFile
+                    | ReadLine
+                    | WriteLine
+                    | Close
 
 StrLen -> 'length'
+
 StrSubstring -> 'substring' '(' Expr ',' Expr ')'
+
 EndOfFile -> 'endOfFile' '(' ')'
+
 ReadLine -> 'readLine' '(' ')'
+
 WriteLine -> 'writeLine' '(' Expr ')'
+
 Close -> 'close' '(' ')'
 
-PrintInstr -> 'print' '(' PrintInstrArgs ')'
-
-PrintInstrArgs -> Expr PrintInstrArgs'
-
-PrintInstrArgs' -> ( ',' Expr PrintInstrArgs' ) | ε
+PrintInstr -> 'print' '(' ExprList ')'

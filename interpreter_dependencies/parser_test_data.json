@@ -1758,7 +1758,7 @@
                                 }
                             },
                             {
-                                "FunInstrBlock": {
+                                "InnerInstrBlock": {
                                     "sub_nodes": [
                                         {
                                             "ForLoop": {
@@ -2177,7 +2177,7 @@
                                 }
                             },
                             {
-                                "ProcInstrBlock": {
+                                "InnerInstrBlock": {
                                     "sub_nodes": [
                                         {
                                             "VarAssign": {
@@ -2647,7 +2647,7 @@
                                                         }
                                                     },
                                                     {
-                                                        "ProcInstrBlock": {
+                                                        "InnerInstrBlock": {
                                                             "sub_nodes": [
                                                                 {
                                                                     "AddrExpr": {

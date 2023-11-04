@@ -6,17 +6,20 @@ from parsed_token import TokenVals, ParsedToken, TokenContents
 class TestParsedToken(TestCase):
 
     def __init__(self, method_name='runTest'):
+        #
+        # All test cases start with a ParsedToken instance representing a '+'
+        #
         super().__init__(method_name)
         self.plus = ParsedToken().set_val(TokenVals.PLUS)
 
-    def test_text_getter(self):
+    def test_getters(self):
         self.assertEqual('+', self.plus.text)
         self.assertEqual(TokenContents.PLUS, self.plus.content)
         self.assertEqual(TokenVals.PLUS, self.plus.val)
 
     def test_text_setter(self):
         #
-        # Set to another recognized text
+        # Set to another recognized text, check all three fields are changed
         #
         self.plus.text = TokenContents.EQUALS.value
         self.assertEqual('=', self.plus.text)
@@ -29,11 +32,6 @@ class TestParsedToken(TestCase):
         self.assertEqual('some_id', self.plus.text)
         self.assertIsNone(self.plus.content)
         self.assertEqual(TokenVals.EQUALS, self.plus.val)
-
-    def test_content_getter(self):
-        self.assertEqual(TokenContents.PLUS, self.plus.content)
-        self.assertEqual(TokenVals.PLUS, self.plus.val)
-        self.assertEqual('+', self.plus.text)
 
     def test_content_setter(self):
         #
@@ -50,11 +48,6 @@ class TestParsedToken(TestCase):
         self.assertIsNone(self.plus.content)
         self.assertEqual(TokenVals.COMMA, self.plus.val)
         self.assertEqual(',', self.plus.text)
-
-    def test_val_getter(self):
-        self.assertEqual(TokenVals.PLUS, self.plus.val)
-        self.assertEqual(TokenContents.PLUS, self.plus.content)
-        self.assertEqual('+', self.plus.text)
 
     def test_val_setter(self):
         #
@@ -80,15 +73,18 @@ class TestParsedToken(TestCase):
         self.assertIsNone(t.content)
 
     #
-    # Only testing that chaining setters modifies test token in place and returns the same token from now on,
-    # as functionality with data being properly written has been already tested
+    # Only testing that chaining setters modifies test token in place and returns the same token
+    # from now on, as functionality with data being properly written has been already tested
     #
     def test_set_content(self):
         t: ParsedToken = self.plus.set_content(TokenContents.EQUALS)
         self.assertEqual(TokenVals.EQUALS, self.plus.val)
         self.assertEqual('=', self.plus.text)
         self.assertIs(t, self.plus)
-
+        #
+        # After setting content to COMMA and then None, the value and text should represent a comma and
+        # the content should be None
+        #
         t = self.plus.set_content(TokenContents.COMMA).set_content(None)
         self.assertIs(t, self.plus)
         self.assertEqual(TokenVals.COMMA, self.plus.val)
@@ -96,6 +92,9 @@ class TestParsedToken(TestCase):
         self.assertIsNone(self.plus.content)
 
     def test_set_val(self):
+        #
+        # Setting value to ID and text to a variable name should make content null
+        #
         t: ParsedToken = self.plus.set_val(TokenVals.ID).set_text("some id")
         self.assertIsNone(self.plus.content)
         self.assertEqual("some id", self.plus.text)

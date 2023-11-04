@@ -1,11 +1,10 @@
 from enum import Enum
 from functools import cache
 from typing import Iterable, Optional
-
 from parsed_token import TokenVals
 
 
-class NodeKinds(Enum):
+class ProgramBlockKinds(Enum):
     PROGRAM = 1
     INSTR_BLOCK = 2
     FUN_DECL = 3
@@ -19,6 +18,9 @@ class Node:
     def __init__(self, line_index: int):
         self.line_index = line_index
         self.sub_nodes: list['Node'] = []
+        #
+        # An internal assertion to ensure that the Node declaration has a sub_nodes field
+        #
         assert Node.SUB_NODES_FIELD in self.__dict__
 
     @property
@@ -53,53 +55,42 @@ class Node:
             self.add_sub_node(sub_node, children)
         return self
 
-    def get_sub_nodes(self) -> Iterable['Node']:
-        for n in self.sub_nodes:
-            yield n
-
     def get_sub_node(self, index: int) -> Optional['Node']:
         result: Optional['Node'] = None
         if 0 <= index < len(self.sub_nodes):
             result = self.sub_nodes[index]
         return result
 
-    def count_sub_nodes(self) -> int:
-        return len(self.sub_nodes)
-
-    def get_kind(self) -> NodeKinds:
-        raise NotImplemented()
-
 
 class Program(Node):
     def add_block(self, program_block: 'ProgramBlock') -> 'Program':
         match program_block.get_kind():
-            case NodeKinds.INSTR_BLOCK:
+            case ProgramBlockKinds.INSTR_BLOCK:
                 self.add_sub_node(program_block, True)
-            case NodeKinds.FUN_DECL:
+            case ProgramBlockKinds.FUN_DECL:
                 self.add_sub_node(program_block)
-            case NodeKinds.PROC_DECL:
+            case ProgramBlockKinds.PROC_DECL:
                 self.add_sub_node(program_block)
-            case NodeKinds.CLASS_DECL:
+            case ProgramBlockKinds.CLASS_DECL:
                 self.add_sub_node(program_block)
             case _:
                 raise RuntimeError("Unknown node kind: " + program_block.get_kind().name)
         return self
 
-    def get_kind(self) -> NodeKinds:
-        return NodeKinds.PROGRAM
-
 
 class ProgramBlock(Node):
-    pass
+    def get_kind(self):
+        pass
 
 
 class InstrBlock(ProgramBlock):
-    def get_kind(self) -> NodeKinds:
-        return NodeKinds.INSTR_BLOCK
+    def get_kind(self) -> ProgramBlockKinds:
+        return ProgramBlockKinds.INSTR_BLOCK
 
 
 class Instr(Node):
-    pass
+    def reduce(self) -> 'Node':
+        return self
 
 
 class GlobDecl(Instr):
@@ -114,12 +105,7 @@ class GlobDecl(Instr):
         return self
 
 
-class BuiltInFunCall(Node):
-    def reduce(self):
-        return self
-
-
-class PrintInstr(BuiltInFunCall):
+class PrintInstr(Instr):
     pass
 
 
@@ -187,10 +173,13 @@ class Op(Node):
     def __init__(self, line_index, val: TokenVals):
         super().__init__(line_index)
         self.val = val
+        #
+        # Internal assertion to ensure that
+        #
         assert Op.VAL_FIELD in self.__dict__
 
-    def add_sub_node(self, sub_node: 'Node', children: bool = False) -> 'Node':
-        assert False, "Logical error, should never be here"
+    def add_sub_node(self, *args):
+        assert False, "Logical error, should not be adding sub-nodes to an operator"
 
 
 class AddOp(Op):
@@ -230,10 +219,6 @@ class UnaryNot(Node):
 
 class SimpleExpr(Node):
     pass
-
-
-# class CallableExpr(Node):
-#     pass
 
 
 class CallableSuffix(Node):
@@ -306,7 +291,7 @@ class BoolLiteral(Node):
 
 
 class AddrAssign(Node):
-    IS_ASSIGN = "is_assign"
+    pass
 
 
 class VarAssign(GlobDecl):
@@ -316,18 +301,15 @@ class VarAssign(GlobDecl):
 
 
 class IfElse(Instr):
-    def reduce(self):
-        return self
+    pass
 
 
 class ElseIf(Instr):
-    def reduce(self):
-        return self
+    pass
 
 
 class Else(Instr):
-    def reduce(self):
-        return self
+    pass
 
 
 class InnerInstrBlock(Node):
@@ -335,8 +317,7 @@ class InnerInstrBlock(Node):
 
 
 class SwitchCase(Instr):
-    def reduce(self):
-        return self
+    pass
 
 
 class SwitchDefault(SwitchCase):
@@ -364,9 +345,9 @@ class DoUntil(Instr):
     pass
 
 
-class FunDecl(Node):
-    def get_kind(self) -> NodeKinds:
-        return NodeKinds.FUN_DECL
+class FunDecl(ProgramBlock):
+    def get_kind(self) -> ProgramBlockKinds:
+        return ProgramBlockKinds.FUN_DECL
 
 
 class FunInstrBlock(Node):
@@ -395,9 +376,9 @@ class ReturnInstr(Node):
         return self
 
 
-class ProcDecl(Node):
-    def get_kind(self) -> NodeKinds:
-        return NodeKinds.PROC_DECL
+class ProcDecl(ProgramBlock):
+    def get_kind(self) -> ProgramBlockKinds:
+        return ProgramBlockKinds.PROC_DECL
 
 
 class ProcInstrBlock(Node):
@@ -469,7 +450,7 @@ class OpenWrite(Node):
         return self
 
 
-class ClassDecl(Node):
+class ClassDecl(ProgramBlock):
     IN_CLASS: str = "in_class"
     PARENT_FIELD: str = "parent"
 
@@ -478,8 +459,8 @@ class ClassDecl(Node):
         self.parent = parent
         assert ClassDecl.PARENT_FIELD in self.__dict__
 
-    def get_kind(self) -> NodeKinds:
-        return NodeKinds.CLASS_DECL
+    def get_kind(self) -> ProgramBlockKinds:
+        return ProgramBlockKinds.CLASS_DECL
 
 
 class ClassBlock(Node):

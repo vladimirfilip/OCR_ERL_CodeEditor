@@ -12,13 +12,13 @@ class TestTokenizer(TestCase):
         self.tokenizer = Tokenizer()
 
     #
-    # Empty lines
+    # Empty lines, should yield no tokens
     #
     def test_tokenize_nothing(self):
         self.__test_lines([], [])
 
     #
-    # Comments
+    # Comments, show yield no tokens
     #
     def test_tokenize_only_empty_comment(self):
         self.__test_line("//", [])
@@ -39,14 +39,26 @@ class TestTokenizer(TestCase):
     def __test_one_known_token(self, text: str):
         t: ParsedToken = ParsedToken().set_text(text)
         id_token: ParsedToken = ParsedToken().set_val(TokenVals.ID)
+        #
+        # The same text with 100 spaces before and after should make no difference on output
+        #
         self.__test_line(text, [t])
         self.__test_line(text + " " * 100, [t])
         self.__test_line(" " * 100 + text, [t])
+        #
+        # Comments should make tokenizer ignore anything after it
+        #
         expected = [t]
         if text == "/":
             expected = []
         self.__test_line(f"{text}//{text}", expected)
+        #
+        # The same text repeated 100 times with spaces in between should yield 100 of the same token
+        #
         self.__test_line((text + " ") * 100, [t] * 100)
+        #
+        # An alphanumeric keyword such as 'global' concatenated 100 times should be identified as an identifier
+        #
         expected = [t] * 100
         if IS_ALNUM[text]:
             expected = [id_token.set_text(text * 100)]
@@ -57,16 +69,26 @@ class TestTokenizer(TestCase):
         self.__test_line(text * 100, expected)
 
     def test_global_keyword(self):
+        #
+        # One global keyword should yield one token of value TokenVals.GLOBAL
+        # We know the rest of the fields are consistent from the ParsedToken test cases.
+        #
         ts: list[ParsedToken] = list(self.tokenizer.tokenize(["global"]))
         self.assertEqual(1, len(ts))
         self.assertEqual(TokenVals.GLOBAL, ts[0].val)
 
     def test_globalee_id(self):
+        #
+        # 'globalee' is not a keyword and so should be marked as an identifier, and should be the only token produced.
+        #
         ts: list[ParsedToken] = list(self.tokenizer.tokenize(["globalee"]))
         self.assertEqual(1, len(ts))
         self.assertEqual(TokenVals.ID, ts[0].val)
 
     def test_global_space_keyword(self):
+        #
+        # A space after the keyword 'global' should have no effect on tokenisation.
+        #
         ts: list[ParsedToken] = list(self.tokenizer.tokenize(["global "]))
         self.assertEqual(1, len(ts))
         self.assertEqual(TokenVals.GLOBAL, ts[0].val)
@@ -106,16 +128,14 @@ class TestTokenizer(TestCase):
         # If not, they should be identified as separate known tokens
         #
         both_alnum: bool = IS_ALNUM[text1] and IS_ALNUM[text2]
-        boolean_operators: list[str] = [TokenContents.EQ.value, TokenContents.NEQ.value, TokenContents.LOWER.value,
-                                        TokenContents.LOWER_EQ.value, TokenContents.GREATER.value,
-                                        TokenContents.GREATER_EQ.value]
 
         expected: list[ParsedToken] = [ParsedToken().set_text(text1), ParsedToken().set_text(text2)]
 
         if both_alnum:
             expected = [self.id_token(text1 + text2)]
 
-        if text1 in boolean_operators and (text2 == "=" or text2 == "=="):
+        comp_operators: list[str] = [TokenContents.LOWER.value, TokenContents.GREATER.value]
+        if text1 in comp_operators and (text2 == "=" or text2 == "=="):
             concat_str = text1 + text2
             expected = [self.id_token(concat_str[:2])]
             if len(concat_str) > 2:
@@ -124,8 +144,8 @@ class TestTokenizer(TestCase):
         if text1 == TokenContents.ELSE.value and text2 == TokenContents.IF.value:
             expected = [self.id_token(TokenContents.ELSEIF.value)]
 
-        if text1 == "=" and text2 == "==":
-            expected = [self.id_token("=="), self.id_token("=")]
+        if text1 == TokenContents.EQUALS.value and text2 == TokenContents.EQ.value:
+            expected = [self.id_token(TokenContents.EQ.value), self.id_token(TokenContents.EQUALS.value)]
 
         self.__test_line(text1 + text2, expected)
 
@@ -267,6 +287,15 @@ class TestTokenizer(TestCase):
         self.__test_line(line, expected_sequence)
 
     #
+    # Symbols that are not part of ERL syntax should cause a SyntaxError to be thrown
+    #
+    def test_reject_invalid_symbols(self):
+        invalid_symbols = "~@{}#?£$%"
+        for symbol in invalid_symbols:
+            with self.assertRaises(SyntaxError):
+                self.__test_line(symbol, [])
+
+    #
     # Utility methods
     #
 
@@ -281,7 +310,7 @@ class TestTokenizer(TestCase):
             e = expected[i]
             self.assertEqual(e, t, f"Position #{i} mismatch: expected={e}, parsed={t}")
             i += 1
-        self.assertGreaterEqual(i, len(expected), f"Expected {len(expected)} tokens, received only {i}")
+        self.assertGreaterEqual(i, len(expected), f"Input: {lines} - Expected {len(expected)} tokens, received only {i}")
 
     @staticmethod
     def id_token(txt: str) -> ParsedToken:

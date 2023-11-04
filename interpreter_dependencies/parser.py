@@ -1,11 +1,9 @@
 from typing import Optional, Callable
-from time import time
-import logging
 from parsed_ast import Node, Program, ProgramBlock, InstrBlock, Instr, ArrayDecl, VarAssign, AddrInstr, \
     AddrExpr, AddrAssign, Identifier, AddrMember, IndexingSuffix, ExprList, Expr, Term, Factor, SimpleExpr, \
     CallableSuffix, IntLiteral, AddrIdOrCall, AddOp, MulOp, UnaryMinus, UnaryNot, PowOp, IfElse, ElseIf, \
     InnerInstrBlock, GoToInstr, SwitchCase, ForLoop, WhileLoop, DoUntil, StrLiteral, NumLiteral, PrintInstr, \
-    BuiltInFunCall, FunDecl, ParamList, Param, FunInstrBlock, ReturnInstr, ProcDecl, ProcInstrBlock, FunExpr, CastStr, CastInt, CastFloat, Input, Length, StrSubstring, ClassDecl, ClassBlock, ClassMember, AttrDecl, \
+    FunDecl, ParamList, Param, ReturnInstr, ProcDecl, FunExpr, CastStr, CastInt, CastFloat, Input, Length, StrSubstring, ClassDecl, ClassBlock, ClassMember, AttrDecl, \
     EndOfFile, ReadLine, WriteLine, FileClose, OpenRead, OpenWrite, NewExpr, BoolLiteral
 from lexer import Lexer
 from parsed_token import TokenVals, ParsedToken, TokenContents
@@ -23,12 +21,11 @@ class Parser:
 
     def parse(self) -> Optional[Node]:
         result: Optional[Node] = self.__program({})
-        start_time = time()
         if self.on_parse_begin is not None:
             self.on_parse_begin()
         if (next_token := self.__lexer.next()) is not None:
             self.curr_line_index = next_token.line_index
-            self.__raise_error(SyntaxError(f"Unexpected '{next_token.text}'"))
+            self.__raise_error(SyntaxError(f"Unexpected '{next_token}'"))
         if self.on_parse_finish is not None:
             self.on_parse_finish(result)
         return result
@@ -67,8 +64,8 @@ class Parser:
         return result if result.sub_nodes else None
 
     def __instr(self, ctx: dict) -> Optional[Instr]:
-        procs: list[Callable] = [self.__glob_decl, self.__arr_or_var, self.__if_else, self.__switch_case,
-                                 self.__for_loop, self.__while_loop, self.__do_until, self.__built_in_instr,
+        procs: list[Callable] = [self.__glob_decl, self.__arr_decl, self.__addr_instr, self.__if_else, self.__switch_case,
+                                 self.__for_loop, self.__while_loop, self.__do_until, self.__print_instr,
                                  self.__return_instr]
         for proc in procs:
             result: Instr = proc(ctx)
@@ -82,8 +79,8 @@ class Parser:
             ctx[TokenVals.GLOBAL] = True
             self.__expect_next_token_on_same_line()
             result = self.__tree_expect(ctx,
-                                          self.__arr_or_var,
-                                          "Syntax error: array or variable declaration expected")
+                                        self.__arr_or_var,
+                                        "Syntax error: array or variable declaration expected")
         return result
 
     def __arr_or_var(self, ctx: dict) -> Optional[Instr]:
@@ -102,24 +99,21 @@ class Parser:
             result = ArrayDecl(self.curr_line_index, is_global).set_name(name)
             self.__token_must_be(TokenContents.OPEN_BRACKET, TokenVals.OPEN_BRACKET, same_line=True)
             result.set_dims(self.__tree_expect(ctx,
-                                                 self.__expr_list,
-                                                 "Syntax error: list of expressions expected"))
+                                               self.__expr_list,
+                                               "Syntax error: list of expressions expected"))
             self.__token_must_be(TokenContents.CLOSED_BRACKET, TokenVals.CLOSED_BRACKET)
         return result
 
     def __var_assign(self, ctx: dict) -> Optional[VarAssign | AddrInstr]:
-        is_global = ctx.pop(TokenVals.GLOBAL, False)
         addr_instr: Optional[AddrInstr] = self.__addr_instr(ctx)
-        result = None
-        if not addr_instr:
-            return result
-        if ctx.pop(AddrAssign.IS_ASSIGN, False):
-            return VarAssign(addr_instr.line_index, is_global).add_sub_node(addr_instr, children=True)
-        return addr_instr
+        if addr_instr is not None and isinstance(addr_instr, VarAssign):
+            return addr_instr
+        return None
 
     def __addr_instr(self, ctx: dict) -> Optional[AddrInstr]:
         addr_expr = self.__addr_expr(ctx)
         result: Optional[AddrInstr] = None
+        is_global = ctx.pop(TokenVals.GLOBAL, False)
         if addr_expr:
             result = AddrInstr(addr_expr.line_index).add_sub_node(addr_expr)
             if ctx.pop(AddrIdOrCall.IS_INSTR, False):
@@ -134,6 +128,7 @@ class Parser:
                                    "Expected variable assignment"))
             # In case parsing the assignment expression enabled the IS_INSTR flag
             ctx.pop(AddrIdOrCall.IS_INSTR, False)
+            return VarAssign(result.line_index, is_global).add_sub_node(result, children=True)
         return result
 
     def __addr_expr(self, ctx: dict) -> Optional[AddrExpr]:
@@ -213,13 +208,13 @@ class Parser:
 
     def __addr_id_or_call(self, ctx: dict) -> Optional[AddrIdOrCall]:
         result: Optional[AddrIdOrCall] = None
-        if ((name := self.__token_str(TokenVals.ID)) is not None or
-                (name := self.__token_str(TokenVals.NEW)) is not None or
-                (name := self.__token_str(TokenVals.SUPER)) is not None):
-            result = AddrIdOrCall(self.curr_line_index).add_sub_node(Identifier(self.curr_line_index, name))
-            if (callable_suffix := self.__callable_suffix(ctx)) is not None:
-                result.add_sub_node(callable_suffix)
-                ctx[AddrIdOrCall.IS_INSTR] = True
+        possible_method_vals: list[TokenVals] = [TokenVals.ID, TokenVals.NEW, TokenVals.SUPER]
+        for val in possible_method_vals:
+            if (name := self.__token_str(val)) is not None:
+                result = AddrIdOrCall(self.curr_line_index).add_sub_node(Identifier(self.curr_line_index, name))
+                if (callable_suffix := self.__callable_suffix(ctx)) is not None:
+                    result.add_sub_node(callable_suffix)
+                    ctx[AddrIdOrCall.IS_INSTR] = True
         return result
 
     def __callable_suffix(self, ctx: dict) -> Optional[CallableSuffix]:
@@ -244,7 +239,6 @@ class Parser:
 
     def __addr_assign(self, ctx: dict) -> Optional[AddrAssign]:
         if self.__token_is(TokenVals.EQUALS):
-            ctx[AddrAssign.IS_ASSIGN] = True
             result = AddrAssign(self.curr_line_index).add_sub_node(self.__tree_expect(ctx,
                                                                                       self.__expr,
                                                                                       "Syntax error: No assignment value specified"))
@@ -523,13 +517,6 @@ class Parser:
                                                    "Expression missing from do-until loop declaration"))
             return result
 
-    def __built_in_instr(self, ctx: dict) -> Optional[BuiltInFunCall]:
-        procs = [self.__print_instr]
-        for proc in procs:
-            if (result := proc(ctx)) is not None:
-                return result
-        return None
-
     def __print_instr(self, ctx: dict) -> Optional[PrintInstr]:
         if self.__token_is(TokenVals.PRINT):
             self.__token_must_be(TokenContents.OPEN_PAREN, TokenVals.OPEN_PAREN, same_line=True)
@@ -537,13 +524,13 @@ class Parser:
             first_arg = self.__tree_expect(
                 ctx,
                 self.__expr,
-                "At least one expression expected in print statement")
+                "At least one argument expected in print statement")
             result.add_sub_node(first_arg)
             while self.__token_is(TokenVals.COMMA):
                 next_arg = self.__tree_expect(
                     ctx,
                     self.__expr,
-                    "Valid expression expected after comma in print statement")
+                    "Expected argument after comma in print statement")
                 result.add_sub_node(next_arg)
             self.__token_must_be(TokenContents.CLOSED_PAREN, TokenVals.CLOSED_PAREN)
             return result
@@ -562,7 +549,7 @@ class Parser:
             self.__token_must_be(TokenContents.CLOSED_PAREN, TokenVals.CLOSED_PAREN, same_line=True)
             self.__expect_new_line()
             result.add_sub_node(self.__tree_expect(ctx,
-                                                   self.__fun_instr_block,
+                                                   self.__inner_instr_block,
                                                    "Non-empty function block required"))
             self.__expect_new_line()
             self.__token_must_be(TokenContents.ENDFUNCTION, TokenVals.ENDFUNCTION)
@@ -582,23 +569,17 @@ class Parser:
 
     def __param(self, ctx: dict) -> Optional[Param]:
         if (param_name := self.__token_str(TokenVals.ID)) is not None:
-            if self.__token_is(TokenVals.BYREF, same_line=True):
-                result = Param(self.curr_line_index, param_name, True)
-            elif self.__token_is(TokenVals.BYVAL, same_line=True):
-                result = Param(self.curr_line_index, param_name, False)
+            if self.__token_is(TokenVals.COLON, same_line=True):
+                if self.__token_is(TokenVals.BYVAL, same_line=True):
+                    result = Param(self.curr_line_index, param_name, False)
+                elif self.__token_is(TokenVals.BYREF, same_line=True):
+                    result = Param(self.curr_line_index, param_name, True)
+                else:
+                    raise SyntaxError(f"'{TokenContents.BYREF.value}' or '{TokenContents.BYVAL.value}' expected after '{TokenContents.COLON.value}'")
             else:
                 result = Param(self.curr_line_index, param_name, False)
             return result
         return None
-
-    def __fun_instr_block(self, ctx: dict) -> Optional[FunInstrBlock]:
-        result = None
-        while (fun_instr := self.__inner_instr(ctx)) is not None:
-            if not result:
-                result = FunInstrBlock(fun_instr.line_index)
-            result.add_sub_node(fun_instr)
-            self.__expect_new_line()
-        return result
 
     def __inner_instr(self, ctx: dict) -> Optional[Instr | GoToInstr]:
         procs = [self.__instr, self.__go_to_instr]
@@ -624,7 +605,7 @@ class Parser:
             self.__expect_new_line()
             result.add_sub_node(self.__tree_expect(
                 ctx,
-                self.__proc_instr_block,
+                self.__inner_instr_block,
                 "Non-empty procedure block required"
             ))
             self.__expect_new_line()
@@ -632,13 +613,6 @@ class Parser:
             self.__expect_new_line()
             return result
         return None
-
-    def __proc_instr_block(self, ctx: dict) -> Optional[ProcInstrBlock]:
-        result = ProcInstrBlock(self.curr_line_index)
-        while (next_proc_instr := self.__inner_instr(ctx)) is not None:
-            result.add_sub_node(next_proc_instr)
-            self.__expect_new_line()
-        return result if result.get_sub_nodes() else None
 
     def __return_instr(self, ctx: dict) -> Optional[ReturnInstr]:
         if self.__token_is(TokenVals.RETURN):
@@ -817,9 +791,9 @@ class Parser:
         return None
 
     def __bool_token(self, same_line: bool = False) -> Optional[bool]:
-        if self.__token_is(TokenVals.TRUE, name=None, same_line=same_line):
+        if self.__token_is(TokenVals.TRUE, same_line=same_line):
             return True
-        if self.__token_is(TokenVals.FALSE, name=None, same_line=same_line):
+        if self.__token_is(TokenVals.FALSE, same_line=same_line):
             return False
         return None
 

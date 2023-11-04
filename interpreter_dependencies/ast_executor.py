@@ -1,11 +1,10 @@
 import operator
 import logging
 import os
-from time import time_ns
 from typing import Callable, Type, Dict, TypeVar, Optional, List, Tuple
 from parsed_ast import Node, Program, VarAssign, Identifier, IntLiteral, ArrayDecl, AddrMember, ExprList, \
     Expr, Term, Factor, UnaryMinus, IfElse, UnaryNot, SwitchCase, ForLoop, GoToInstr, InnerInstrBlock, DoUntil, \
-    WhileLoop, StrLiteral, NumLiteral, PrintInstr, FunDecl, AddrIdOrCall, Param, ReturnInstr, FunInstrBlock, CallableSuffix, ProcDecl, ProcInstrBlock, CastStr, CastInt, CastFloat, Length, StrSubstring, Input, EndOfFile, \
+    WhileLoop, StrLiteral, NumLiteral, PrintInstr, FunDecl, AddrIdOrCall, Param, ReturnInstr, CallableSuffix, ProcDecl, CastStr, CastInt, CastFloat, Length, StrSubstring, Input, EndOfFile, \
     ReadLine, WriteLine, FileClose, OpenRead, OpenWrite, ClassDecl, NewExpr, AddrExpr, ClassMember, AttrDecl, BoolLiteral
 from parsed_token import TokenVals, KNOWN_TOKEN_VALS, TokenContents
 from parser import Parser
@@ -178,8 +177,6 @@ class AstExecutor:
             ProcDecl: self.__execute_proc_decl,
             ClassDecl: self.__execute_class_decl,
             ReturnInstr: self.__execute_return_instr,
-            FunInstrBlock: self.__execute_node,
-            ProcInstrBlock: self.__execute_node,
             AddrIdOrCall: self.__eval_addr_id_or_call,
             AddrExpr: self.__eval_addr_expr,
             ReadLine: self.__eval_read_line,

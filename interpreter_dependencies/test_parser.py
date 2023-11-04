@@ -20,6 +20,7 @@ class TestParser(TestCase):
 
     def setUp(self):
         self.ast_to_dict_parser = ASTToJsonParser()
+        self.maxDiff = None
 
     def tearDown(self) -> None:
         self.__parser = None
@@ -217,7 +218,7 @@ class TestParser(TestCase):
             "        x = 45454 + x",
             "    default:",
             "        x = \"valid case not found\"",
-            "endswitch"
+            "endswitch",
         ])
         self.__test_node(self.__parser.parse(), "test_switch_case")
 

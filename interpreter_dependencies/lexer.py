@@ -26,7 +26,7 @@ class Lexer:
         """
         if self.__buf:
             return self.__buf.pop(0)
-        result: (str, TokenVals) = next(self.__tokens, ParsedToken().set_val(TokenVals.EOF))
+        result: Optional[ParsedToken] = next(self.__tokens, ParsedToken().set_val(TokenVals.EOF))
         if result.val == TokenVals.EOF:
             result = None
         return result
