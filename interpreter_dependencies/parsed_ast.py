@@ -5,7 +5,6 @@ from parsed_token import TokenVals
 
 
 class ProgramBlockKinds(Enum):
-    PROGRAM = 1
     INSTR_BLOCK = 2
     FUN_DECL = 3
     PROC_DECL = 4
@@ -89,11 +88,18 @@ class InstrBlock(ProgramBlock):
 
 
 class Instr(Node):
+    #
+    # The type of instruction that should be carried out is stored
+    # in the node's type, and so Instr instances should never be removed from the AST
+    #
     def reduce(self) -> 'Node':
         return self
 
 
 class GlobDecl(Instr):
+    #
+    # Context flag to be used in subsequent variable assignments
+    #
     IS_GLOBAL_FIELD: str = "is_global"
 
     def __init__(self, is_global, line_index):
@@ -139,6 +145,10 @@ class AddrExpr(Node):
 
 
 class AddrIdOrCall(Node):
+    #
+    # Context flag key to indicate whether the current address expression being parsed is a subroutine call,
+    # which would make it a valid instruction
+    #
     IS_INSTR = "is_call"
     pass
 
@@ -168,6 +178,9 @@ class Factor(Node):
 
 
 class Op(Node):
+    """
+    A parent class for all operators, storing a TokenVals member and having no child nodes
+    """
     VAL_FIELD: str = "val"
 
     def __init__(self, line_index, val: TokenVals):
@@ -208,11 +221,17 @@ class PowOp(Op):
 
 
 class UnaryMinus(Node):
+    #
+    # The unary minus operation is indicated through the node's type, and so the node should never be removed
+    #
     def reduce(self):
         return self
 
 
 class UnaryNot(Node):
+    #
+    # Unary not operation is indicated through the node's type, and so the node should never be removed from the tree
+    #
     def reduce(self):
         return self
 
@@ -412,6 +431,9 @@ class Input(FunExpr):
 
 
 class Length(Node):
+    #
+    # Operation to be carried out is conveyed through node's type
+    #
     def reduce(self):
         return self
 
@@ -451,7 +473,14 @@ class OpenWrite(Node):
 
 
 class ClassDecl(ProgramBlock):
+    #
+    # Context flag to indicate to parsing methods handling procedure and function declarations
+    # whether they are inside a class
+    #
     IN_CLASS: str = "in_class"
+    #
+    # Stores name of parent class
+    #
     PARENT_FIELD: str = "parent"
 
     def __init__(self, line_index, parent: str):
@@ -468,6 +497,9 @@ class ClassBlock(Node):
 
 
 class ClassMember(Node):
+    #
+    # Flag to indicate whether the member being parsed is public
+    #
     IS_PUBLIC_FLAG: str = "is_public_flag"
     IS_PUBLIC_FIELD: str = "is_public"
 

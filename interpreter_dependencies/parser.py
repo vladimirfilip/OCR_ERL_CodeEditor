@@ -77,7 +77,7 @@ class Parser:
         result: Optional[Instr] = None
         if self.__token_is(TokenVals.GLOBAL):
             ctx[TokenVals.GLOBAL] = True
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
             result = self.__tree_expect(ctx,
                                         self.__arr_or_var,
                                         "Syntax error: array or variable declaration expected")
@@ -248,7 +248,7 @@ class Parser:
         result: Optional[ExprList] = None
         if (expr := self.__expr(ctx)) is not None:
             result = ExprList(expr.line_index).add_sub_node(expr)
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
             while self.__token_is(TokenVals.COMMA):
                 result.add_sub_node(self.__tree_expect(ctx,
                                                        self.__expr,
@@ -301,12 +301,12 @@ class Parser:
         # Set aside highest priority single tokens that trigger recursion
         #
         if self.__token_is(TokenVals.MINUS):
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
             return UnaryMinus(self.curr_line_index).add_sub_node(self.__tree_expect(ctx,
                                                                                     self.__simple_expr,
                                                                                     f"'{TokenContents.MINUS.value}' detected but no subsequent expression found"))
         if self.__token_is(TokenVals.NOT):
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
             return UnaryNot(self.curr_line_index).add_sub_node(self.__tree_expect(ctx,
                                                                                   self.__simple_expr,
                                                                                   f"'{TokenContents.NOT.value}' detected but no subsequent expression found"))
@@ -384,7 +384,7 @@ class Parser:
 
     def __if_else(self, ctx: dict) -> Optional[IfElse]:
         if self.__token_str(TokenVals.IF):
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
             result = IfElse(self.curr_line_index).add_sub_node(self.__tree_expect(ctx,
                                                                                   self.__expr,
                                                                                   "No expression found in if statement declaration"))
@@ -401,11 +401,11 @@ class Parser:
 
     def __else_if(self, ctx: dict) -> Optional[ElseIf]:
         if self.__token_str(TokenVals.ELSEIF):
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
             result = ElseIf(self.curr_line_index).add_sub_node(self.__tree_expect(ctx,
                                                                                   self.__expr,
                                                                                   err_msg="No expression found in if statement declaration"))
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
             self.__token_must_be(TokenContents.THEN, TokenVals.THEN)
             self.__expect_new_line()
             result.add_sub_node(self.__tree_expect(ctx,
@@ -438,14 +438,14 @@ class Parser:
 
     def __switch_case(self, ctx: dict) -> Optional[SwitchCase]:
         if self.__token_str(TokenVals.SWITCH):
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
             result = SwitchCase(self.curr_line_index).add_sub_node(self.__tree_expect(ctx,
                                                                                       self.__expr,
                                                                                       "Expression missing from switch-case statement declaration"))
             self.__token_must_be(TokenContents.COLON, TokenVals.COLON, same_line=True)
             self.__expect_new_line()
             while self.__token_str(TokenVals.CASE):
-                self.__expect_next_token_on_same_line()
+                self.__expect_no_newline()
                 result.add_sub_node(self.__tree_expect(ctx,
                                                        self.__expr,
                                                        "Expression missing from case statement"))
@@ -471,12 +471,12 @@ class Parser:
             var_id: str = self.__token_expect(TokenVals.ID, same_line=True)
             result.add_sub_node(Identifier(self.curr_line_index, var_id))
             self.__token_must_be(TokenContents.EQUALS, TokenVals.EQUALS, same_line=True)
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
             result.add_sub_node(self.__tree_expect(ctx,
                                                    self.__expr,
                                                    "Expression for lower bound of for loop missing"))
             self.__token_must_be(TokenContents.TO, TokenVals.TO, same_line=True)
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
             result.add_sub_node(self.__tree_expect(ctx,
                                                    self.__expr,
                                                    "Expression for upper bound of for loop missing"))
@@ -494,7 +494,7 @@ class Parser:
 
     def __while_loop(self, ctx: dict) -> Optional[WhileLoop]:
         if self.__token_str(TokenVals.WHILE):
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
             result = WhileLoop(self.curr_line_index).add_sub_node(self.__tree_expect(ctx,
                                                                                      self.__expr,
                                                                                      "Expression missing from while loop declaration"))
@@ -541,16 +541,28 @@ class Parser:
             result = FunDecl(self.curr_line_index)
             if self.__token_is(TokenVals.NEW):
                 self.__raise_error(SyntaxError(f"Constructors must be procedures, not functions"))
+            #
+            # Function identifier and opening bracket is expected on the same line as 'function' keyword
+            #
             func_name: str = self.__token_expect(TokenVals.ID, same_line=True)
             func_identifier: Identifier = Identifier(self.curr_line_index, func_name)
             result.add_sub_node(func_identifier)
             self.__token_must_be(TokenContents.OPEN_PAREN, TokenVals.OPEN_PAREN, same_line=True)
             result.add_sub_node(self.__param_list(ctx))
+            #
+            # Closing bracket expected on the same line as the last parameter
+            #
             self.__token_must_be(TokenContents.CLOSED_PAREN, TokenVals.CLOSED_PAREN, same_line=True)
+            #
+            # Instruction block expected to start on a new line
+            #
             self.__expect_new_line()
             result.add_sub_node(self.__tree_expect(ctx,
                                                    self.__inner_instr_block,
                                                    "Non-empty function block required"))
+            #
+            # 'endfunction' should be on a separate line
+            #
             self.__expect_new_line()
             self.__token_must_be(TokenContents.ENDFUNCTION, TokenVals.ENDFUNCTION)
             self.__expect_new_line()
@@ -655,10 +667,10 @@ class Parser:
     def __class_member(self, ctx: dict) -> Optional[ClassMember]:
         if self.__token_is(TokenVals.PUBLIC):
             is_public = True
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
         elif self.__token_is(TokenVals.PRIVATE):
             is_public = False
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
         else:
             is_public = True
         ctx[ClassMember.IS_PUBLIC_FLAG] = is_public
@@ -679,7 +691,7 @@ class Parser:
 
     def __member_init(self, ctx: dict) -> Optional[Expr]:
         if self.__token_is(TokenVals.EQUALS, same_line=True):
-            self.__expect_next_token_on_same_line()
+            self.__expect_no_newline()
             return self.__tree_expect(ctx,
                                       self.__expr,
                                       "Value required when assigning a value to an class attribute")
@@ -827,13 +839,21 @@ class Parser:
             self.__raise_error(SyntaxError(f"Expected '{name}', received '{n}'"))
 
     def __expect_new_line(self):
+        """
+        Throws error if the next token is not on a new line
+        :return: None
+        """
         t: Optional[ParsedToken] = self.__lexer.next()
         if t is not None:
             if self.__token_on_same_line(t):
                 self.__raise_error(SyntaxError(f"{t} should be on a new line"))
             self.__lexer.push_front(t)
 
-    def __expect_next_token_on_same_line(self):
+    def __expect_no_newline(self) -> None:
+        """
+        Throws error if the next token is on a new line
+        :return: None
+        """
         t: Optional[ParsedToken] = self.__lexer.next()
         if t is not None:
             if not self.__token_on_same_line(t):
@@ -841,8 +861,16 @@ class Parser:
             self.__lexer.push_front(t)
 
     def __token_on_same_line(self, token: ParsedToken) -> bool:
-        if self.curr_line_index is not None and token.line_index != self.curr_line_index:
-            return False
+        """
+        Utility function to indicate presence of a newline
+        :param token: the token which can be on a newline or the same line as the previous token
+        :return: True if the next token is on the same line as the previous token, otherwise False
+        """
+        if self.curr_line_index is not None:
+            if token.line_index < self.curr_line_index:
+                raise RuntimeError("Line index of the next token should never be lower than that of the previous one")
+            if token.line_index > self.curr_line_index:
+                return False
         return True
 
     def __tree_expect(self, ctx: dict, parse_method: Callable, err_msg: str) -> Node:

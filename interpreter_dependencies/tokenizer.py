@@ -173,7 +173,6 @@ class Tokenizer:
                     # Split each sequence of non-whitespaces into recognized tokens of the language
                     #
                     for token in Tokenizer.__tokens(meta_token):
-                        token.line_index = Tokenizer.CURRENT_LINE
                         yield token
 
     @staticmethod
@@ -205,7 +204,7 @@ class Tokenizer:
                 skip: bool = False
                 for known_content in KNOWN_CONTENTS_DESC:
                     if meta_token.startswith(known_content.value, i):
-                        yield ParsedToken().set_content(known_content)
+                        yield ParsedToken(line_index=Tokenizer.CURRENT_LINE).set_content(known_content)
                         i += len(known_content.value)
                         skip = True
                         break
@@ -238,7 +237,7 @@ class Tokenizer:
         # set_val() set the token value to ID, but set_text() overrides that if the text matches that
         # of a keyword or symbol in KNOWN_TOKENS
         #
-        return ParsedToken().set_val(TokenVals.ID).set_text(text), i
+        return ParsedToken(line_index=Tokenizer.CURRENT_LINE).set_val(TokenVals.ID).set_text(text), i
 
     @staticmethod
     def __num_cond(first_char: str, second_char: str) -> bool:
@@ -279,4 +278,4 @@ class Tokenizer:
         # If not, the value should be TokenVals.NUM
         #
         val = TokenVals.INT if text.isdigit() else TokenVals.NUM
-        return ParsedToken().set_val(val).set_text(text), i + token_len
+        return ParsedToken(line_index=Tokenizer.CURRENT_LINE).set_val(val).set_text(text), i + token_len

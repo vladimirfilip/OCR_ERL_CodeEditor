@@ -257,9 +257,18 @@ class ParsedToken:
     __t_text: str
     __t_content: Optional[TokenContents]
     __t_val: TokenVals
+    __line_index: int
 
     def __init__(self, **kwargs):
-        self.line_index = kwargs.pop("line_index", None)
+        self.__line_index = kwargs.pop("line_index", None)
+
+    @property
+    def line_index(self):
+        return self.__line_index
+
+    @line_index.setter
+    def line_index(self, *args):
+        raise RuntimeError("Should not overwrite the line-index of a token")
 
     def __eq__(self, other: 'ParsedToken') -> bool:
         return self.text == other.text and self.content == other.content and self.val == other.val
