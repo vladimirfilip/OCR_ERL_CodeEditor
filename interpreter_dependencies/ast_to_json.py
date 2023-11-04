@@ -1,5 +1,6 @@
 from typing import Type, Callable
 from parsed_ast import Node, GlobDecl, ArrayDecl, Identifier, IntLiteral, StrLiteral, NumLiteral, BoolLiteral, Op, GoToInstr, Param, ClassDecl, ClassMember
+import parsed_ast
 from parsed_token import KNOWN_TOKEN_VALS
 
 
@@ -80,7 +81,7 @@ class ASTToJsonParser:
         result: dict = self.__node2dict(array_decl, self.__get_translated_type(ArrayDecl, True))
         node_type = ASTToJsonParser.__get_node_class(array_decl)
         result[node_type][ArrayDecl.NAME_FIELD] = array_decl.name
-        result[node_type][ArrayDecl.DIMS_FIELD] = [self.__node2dict(node) for node in array_decl.dims]
+        result[node_type][ArrayDecl.DIMS_FIELD] = [self.__node2dict(node, self.__get_translated_type(type(node))) for node in array_decl.dims]
         return result
 
     def __operator2dict(self, operator: Op):
