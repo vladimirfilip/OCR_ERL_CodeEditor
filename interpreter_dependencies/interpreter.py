@@ -3,7 +3,7 @@ from typing import Iterable, Iterator
 from sys import argv, stderr
 from time import time
 from ast_executor import AstExecutor
-from interpreter_dependencies.parsed_ast import Node
+from parsed_ast import Node
 from lexer import Lexer
 from parser import Parser
 from tokenizer import Tokenizer
