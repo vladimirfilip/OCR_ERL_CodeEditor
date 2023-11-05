@@ -19,7 +19,7 @@ class Interpreter:
         self.__tokenizer = Tokenizer(on_new_line_input=lambda s: self.source_code.append(s))
         self.__lexer = Lexer(self.__tokenizer, lines)
         self.__parser = Parser(self.__lexer, on_parse_begin=self.on_parse_begin, on_parse_finish=self.on_parse_finish, on_error=lambda *args: self.on_error(*args, post_parse=False))
-        self.__executor = AstExecutor(self.__parser, on_error=lambda *args: self.on_error(*args, post_parse=True))
+        self.__executor = AstExecutor(self.__parser, on_error=self.on_executor_error)
 
     def interpret(self):
         logging.debug("\n\n" + "#" * 50 + "\n" + "BEGINNING EXECUTION" + "\n" + "#" * 50)
@@ -38,6 +38,13 @@ class Interpreter:
         stderr.write("\n".join(whole_msg) + "\n")
         stderr.flush()
         exit(-1)
+
+    def on_executor_error(self, e: Exception, nodes: list[Node]):
+        source_code_indices = []
+        for node in nodes:
+            source_code_indices += list(range(node.line_index, node.end_line_index + 1))
+        source_code_indices = sorted(list(set(source_code_indices)))
+        self.on_error(e, source_code_indices, post_parse=True)
 
     def on_parse_finish(self, ast_node: Node):
         logging.debug(f" ### FINISHED PARSING IN {time() - self.parse_begin_time} seconds ###")

@@ -241,7 +241,7 @@ class Parser:
         if self.__token_is(TokenVals.EQUALS):
             result = AddrAssign(self.curr_line_index).add_sub_node(self.__tree_expect(ctx,
                                                                                       self.__expr,
-                                                                                      "Syntax error: No assignment value specified"))
+                                                                                      "No assignment value specified"))
             return result
 
     def __expr_list(self, ctx: dict) -> Optional[ExprList]:
@@ -252,7 +252,7 @@ class Parser:
             while self.__token_is(TokenVals.COMMA):
                 result.add_sub_node(self.__tree_expect(ctx,
                                                        self.__expr,
-                                                       f"Syntax error: '{TokenContents.COMMA.value}' detected but no expression found"))
+                                                       f"'{TokenContents.COMMA.value}' detected but no expression found"))
         return result
 
     def __expr(self, ctx: dict) -> Optional[Expr]:

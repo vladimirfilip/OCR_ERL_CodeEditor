@@ -236,7 +236,7 @@ class SymAddr:
             value = self.value
         except ValueError:
             value = None
-        return f"Address to {self.name}" + f" of value {value}" if value is not None else " of null value"
+        return f"Address to '{self.name}'" + f" of value {value}" if value is not None else " of null value"
 
 
 class SymRef(SymAddr):

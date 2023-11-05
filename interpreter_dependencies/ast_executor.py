@@ -254,7 +254,8 @@ class AstExecutor:
         }
         self.__output_stream = output_stream
         self.__instance_count = {}
-        self.on_error = on_error
+        self.__on_error = on_error
+        self.__erroneous_nodes = []
 
     def push_callback(self, callback: Callable, post: bool = False):
         if post:
@@ -273,7 +274,12 @@ class AstExecutor:
         parsed: Node = self.__parser.parse()
         if parsed:
             ctx = ExeCtx()
-            self.__execute(parsed, ctx)
+            try:
+                self.__execute(parsed, ctx)
+            except BaseException as e:
+                if self.__on_error is not None:
+                    self.__on_error(e, self.__erroneous_nodes)
+                raise e
             ctx.global_table.close(recursive=True)
 
     # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- #
@@ -293,6 +299,11 @@ class AstExecutor:
             try:
                 proc(node, ctx)
             except BaseException as e:
+                #
+                # If no erroneous nodes are recorded, then the node being executed when the error was raised is set as the erroneous node
+                #
+                if not self.__erroneous_nodes:
+                    self.__erroneous_nodes = [node]
                 logging.error(err_msg(e))
                 raise e
             else:
@@ -1043,15 +1054,10 @@ class AstExecutor:
         suffix: str = "ed" if post else "ing"
         ending: str = "." if post else " ..."
         ending = f": {result}{ending}" if result else ending
-        logging.debug(f"{prefix}{suffix} node {node.__class__.__name__} at line {node.line_index}: {ending}")
+        logging.debug(f"{prefix}{suffix} node {node.__class__.__name__} at line {node.line_index + 1}: {ending}")
 
     def __raise_error(self, nodes: list[Node], e: Exception):
-        if self.on_error is not None:
-            line_indices = []
-            for node in nodes:
-                line_indices += list(range(node.line_index, node.end_line_index + 1))
-            line_indices = sorted(list(set(line_indices)))
-            self.on_error(e, line_indices)
+        self.__erroneous_nodes = nodes
         raise e
 
     @staticmethod
