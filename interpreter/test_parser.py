@@ -1,11 +1,9 @@
 import json
-from typing import Iterable, Optional, Type, Callable
+from typing import Iterable, Optional
 from unittest import TestCase
-
-from interpreter_dependencies.ast_to_json import ASTToJsonParser
+from ast_to_json import ASTToJsonParser
 from lexer import Lexer
-from parsed_ast import Node, GlobDecl, ArrayDecl, Identifier, IntLiteral, AddOp, MulOp, PowOp, GoToInstr, StrLiteral, NumLiteral, Param, ClassMember, ClassDecl, BoolLiteral, Op
-from parsed_token import KNOWN_TOKEN_VALS
+from parsed_ast import Node
 from parser import Parser
 from tokenizer import Tokenizer
 
@@ -52,19 +50,44 @@ class TestParser(TestCase):
             self.__init_parser(["global array y[]"])
             self.__parser.parse()
         self.assertEqual(str(ex.exception), "Syntax error: list of expressions expected")
+        self.tearDown()
 
     def test_arr_decl_no_id(self):
-        with self.assertRaises(SyntaxError):
+        with self.assertRaises(SyntaxError) as ex:
             self.__init_parser(["global array []"])
             self.__parser.parse()
+        self.assertEqual(str(ex.exception), "Expected 'ID', received '['")
+        self.tearDown()
+
+    def test_arr_decl_enforce_no_newline(self):
+        #
+        # array declaration should be on the same line
+        #
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser([
+                "global",
+                "array arr[2]",
+            ])
+            self.__parser.parse()
+        self.assertEqual(str(ex.exception), "'array' should not be in a new line")
 
     def test_arr_decl_no_array(self):
         #
         # With no array keyword, the parser should think the statement is a variable assignment
         #
-        with self.assertRaises(SyntaxError):
+        with self.assertRaises(SyntaxError) as ex:
             self.__init_parser(["global x[3,3]"])
             self.__parser.parse()
+        self.assertEqual(str(ex.exception), "Expected variable assignment")
+
+    def test_just_expr(self):
+        #
+        # Just "x + 2" is not a valid program
+        #
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser(["x + 2"])
+            self.__parser.parse()
+        self.assertEqual(str(ex.exception), "Expected variable assignment")
 
     def test_var_assign(self):
         self.__init_parser(["x = 3"])
@@ -97,6 +120,11 @@ class TestParser(TestCase):
     def test_indexed_field_assign(self):
         self.__init_parser(["x.y[0] = 3"])
         self.__test_node(self.__parser.parse(), "test_indexed_field_assign")
+
+    def test_indexed_field_assign_no_index(self):
+        with self.assertRaises(SyntaxError):
+            self.__init_parser(["x.y[] = 3"])
+            self.__test_node(self.__parser.parse(), "")
 
     def test_matrix_element_assign(self):
         self.__init_parser(["x.y[0,1] = -3"])
@@ -134,6 +162,18 @@ class TestParser(TestCase):
         ])
         self.__test_node(self.__parser.parse(), "test_if_statement")
 
+    def test_if_statement_no_then(self):
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser(["if x == 3 ", "x = 4", "endif"])
+            self.__test_node(self.__parser.parse(), "")
+        self.assertEqual(str(ex.exception), "Expected 'then', received 'ID['x']'")
+
+    def test_if_statement_no_endif(self):
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser(["if x == 3 then", "x = 4"])
+            self.__test_node(self.__parser.parse(), "")
+        self.assertEqual(str(ex.exception), "Expected 'endif' before end of file")
+
     def test_if_else_if_statement(self):
         self.__init_parser([
             "if x == 3 then",
@@ -168,6 +208,17 @@ class TestParser(TestCase):
         ])
         self.__test_node(self.__parser.parse(), "test_for_loop")
 
+    def test_for_loop_wrong_id(self):
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser([
+                "for i = 0 to x",
+                "y = i * 2",
+                "a = i * 3",
+                "next j",
+            ])
+            self.__test_node(self.__parser.parse(), "")
+        self.assertEqual(str(ex.exception), "Expected 'i', received 'j'")
+
     def test_for_loop_nested(self):
         self.__init_parser([
             "for i = 0 to n",
@@ -189,6 +240,16 @@ class TestParser(TestCase):
         ])
         self.__test_node(self.__parser.parse(), "test_while_loop")
 
+    def test_while_loop_no_endwhile(self):
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser([
+                "while x == y.z OR 9 == 0",
+                "x = \"no \" + x",
+                "z = z ^ 2",
+            ])
+            self.__test_node(self.__parser.parse(), "")
+        self.assertEqual(str(ex.exception), "Expected 'endwhile' before end of file")
+
     def test_nested_while_loops(self):
         self.__init_parser([
             "while x == y.z AND j == k",
@@ -209,6 +270,18 @@ class TestParser(TestCase):
         ])
         self.__test_node(self.__parser.parse(), "test_do_until_loop")
 
+    def test_do_until_loop_no_cond(self):
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser([
+                "do",
+                "x = 3",
+                "y = 4 * 6",
+                "continue",
+                "until"
+            ])
+            self.__test_node(self.__parser.parse(), "")
+        self.assertEqual(str(ex.exception), "Expression missing from do-until loop declaration")
+
     def test_switch_case(self):
         self.__init_parser([
             "switch x:",
@@ -221,6 +294,20 @@ class TestParser(TestCase):
             "endswitch",
         ])
         self.__test_node(self.__parser.parse(), "test_switch_case")
+
+    def test_switch_case_missing_block(self):
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser([
+                "switch x:",
+                "    case 2:",
+                "        x = x ^ 2",
+                "    case 3:",
+                "    default:",
+                "        x = \"valid case not found\"",
+                "endswitch",
+            ])
+            self.__test_node(self.__parser.parse(), "")
+        self.assertEqual(str(ex.exception), "Block missing from case statement")
 
     def test_switch_case_just_default(self):
         self.__init_parser([
@@ -265,6 +352,22 @@ class TestParser(TestCase):
         ])
         self.__test_node(self.__parser.parse(), "test_print")
 
+    def test_print_no_closing_paren(self):
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser([
+                "print(x, y, x + 2, x ^ 2 - 2, f(z.a[3]), b.l.y"
+            ])
+            self.__test_node(self.__parser.parse(), "")
+        self.assertEqual(str(ex.exception), "Expected ')' before end of file")
+
+    def test_print_no_args(self):
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser([
+                "print()"
+            ])
+            self.__test_node(self.__parser.parse(), "")
+        self.assertEqual(str(ex.exception), "At least one argument expected in print statement")
+
     def test_fun_decl(self):
         self.__init_parser([
             "function sum(a, b, c)",
@@ -272,6 +375,25 @@ class TestParser(TestCase):
             "endfunction",
         ])
         self.__test_node(self.__parser.parse(), "test_fun_decl")
+
+    def test_fun_decl_no_id(self):
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser([
+                "function (a, b, c)",
+                "    return a + b + c",
+                "endfunction",
+            ])
+            self.__test_node(self.__parser.parse(), "")
+        self.assertEqual(str(ex.exception), "Expected 'ID', received '('")
+
+    def test_fun_decl_no_endfunction(self):
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser([
+                "function f(a, b, c)",
+                "    return a + b + c"
+            ])
+            self.__test_node(self.__parser.parse(), "")
+        self.assertEqual(str(ex.exception), "Expected 'endfunction' before end of file")
 
     def test_fun_decl_long_block(self):
         self.__init_parser([
@@ -376,6 +498,24 @@ class TestParser(TestCase):
         ])
         self.__test_node(self.__parser.parse(), "test_class_decl_simple")
 
+    def test_class_decl_no_id(self):
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser([
+                "class ",
+                "    public __val"
+            ])
+            self.__test_node(self.__parser.parse(), "")
+        self.assertEqual(str(ex.exception), "Expected 'ID', received 'public'")
+
+    def test_class_decl_no_endclass(self):
+        with self.assertRaises(SyntaxError) as ex:
+            self.__init_parser([
+                "class A",
+                "    public __val"
+            ])
+            self.__test_node(self.__parser.parse(), "")
+        self.assertEqual(str(ex.exception), "Expected 'endclass' before end of file")
+
     def test_class_decl_inherit(self):
         self.__init_parser([
             "class B inherits A",
@@ -395,25 +535,12 @@ class TestParser(TestCase):
         ])
         self.__test_node(self.__parser.parse(), "test_class_instantiate")
 
-    # Used for debug
-
-    # def test(self):
-    #     self.__init_parser([
-    #         "x = 0",
-    #         "while x > 2",
-    #         "   x = x * 2",
-    #         "endwhile",
-    #         "x = 2 ^ x",
-    #     ])
-    #     self.__test_node(self.__parser.parse(), "test")
-
     # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- #
 
     def __test_node(self, node: Optional[Node], expected_json_key: str):
         expected_dict: dict = TestParser.EXPECTED[expected_json_key]
         node_dict: dict = self.ast_to_dict_parser.parse(node)
         self.assertDictEqual(expected_dict, node_dict)
-
 
     # ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- #
 

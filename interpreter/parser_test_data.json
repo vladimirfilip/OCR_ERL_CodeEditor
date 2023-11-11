@@ -83,10 +83,10 @@
                         "sub_nodes": [
                             { "Identifier": { "name": "x" } },
                             {
-                                "Factor": {
+                                "Comparison": {
                                     "sub_nodes": [
                                         { "Identifier": { "name": "y" } },
-                                        { "PowOp": { "val": "==" } },
+                                        { "CompOp": { "val": "==" } },
                                         { "StrLiteral": { "val": "3" } }
                                     ]
                                 }
@@ -106,7 +106,7 @@
                         "sub_nodes": [
                             { "Identifier": { "name":  "x" } },
                             {
-                                "Expr": {
+                                "ArithmExpr": {
                                     "sub_nodes": [
                                         { "IntLiteral": { "val":  3 } },
                                         { "AddOp": { "val": "+" } },
@@ -143,23 +143,22 @@
                                             "UnaryNot": {
                                                 "sub_nodes": [
                                                     {
-                                                        "Term": {
+                                                        "Disjunction": {
                                                             "sub_nodes": [
                                                                 {
-                                                                    "Factor": {
+                                                                    "Comparison": {
                                                                         "sub_nodes": [
                                                                             {"Identifier": {"name": "y"}},
-                                                                            {"PowOp": {"val": "=="}},
+                                                                            {"CompOp": {"val": "=="}},
                                                                             {"NumLiteral": {"val": 3.09}}
                                                                         ]
                                                                     }
                                                                 },
-                                                                { "MulOp": {"val": "OR"}},
                                                                 {
-                                                                    "Factor": {
+                                                                    "Comparison": {
                                                                         "sub_nodes": [
                                                                             {"IntLiteral": {"val": 4}},
-                                                                            {"PowOp": {"val": "!="}},
+                                                                            {"CompOp": {"val": "!="}},
                                                                             {"IntLiteral": {"val": 6}}
                                                                         ]
                                                                     }
@@ -170,12 +169,11 @@
                                                 ]
                                             }
                                         },
-                                        {"AddOp": {"val": "AND"}},
                                         {
-                                            "Factor": {
+                                            "Comparison": {
                                                 "sub_nodes": [
                                                     {"Identifier": {"name": "y"}},
-                                                    {"PowOp": {"val": ">"}},
+                                                    {"CompOp": {"val": ">"}},
                                                     {"IntLiteral": {"val": 7}}
                                                 ]
                                             }
@@ -198,7 +196,7 @@
                         "sub_nodes": [
                             {"Identifier": {"name": "x"}},
                             {
-                                "Expr": {
+                                "ArithmExpr": {
                                     "sub_nodes": [
                                         {
                                             "UnaryMinus": {
@@ -216,7 +214,7 @@
                                                     { "IntLiteral": {"val": 5}},
                                                     { "MulOp": { "val": "/" }},
                                                     {
-                                                        "Expr": {
+                                                        "ArithmExpr": {
                                                             "sub_nodes": [
                                                                 {"IntLiteral": {"val": 5}},
                                                                 {"AddOp": { "val": "-" }},
@@ -598,10 +596,10 @@
                     "IfElse": {
                         "sub_nodes": [
                             {
-                                "Factor": {
+                                "Comparison": {
                                     "sub_nodes": [
                                         { "Identifier": { "name": "x" } },
-                                        { "PowOp": { "val": "==" } },
+                                        { "CompOp": { "val": "==" } },
                                         { "IntLiteral": { "val": 3 } }
                                     ]
                                 }
@@ -616,10 +614,10 @@
                                 }
                             },
                             {
-                                "Factor": {
+                                "Comparison": {
                                     "sub_nodes": [
                                         { "Identifier": { "name": "x" } },
-                                        { "PowOp": { "val": "==" } },
+                                        { "CompOp": { "val": "==" } },
                                         { "StrLiteral": { "val": "4" } }
                                     ]
                                 }
@@ -630,7 +628,7 @@
                                     "sub_nodes": [
                                         { "Identifier": { "name": "y" } },
                                         {
-                                            "Expr": {
+                                            "ArithmExpr": {
                                                 "sub_nodes": [
                                                     { "NumLiteral": { "val": 6.25 } },
                                                     { "AddOp": { "val": "+" } },
@@ -671,10 +669,10 @@
                     "IfElse": {
                         "sub_nodes": [
                             {
-                                "Factor": {
+                                "Comparison": {
                                     "sub_nodes": [
                                         {"Identifier": {"name": "x"}},
-                                        {"PowOp": {"val": "=="}},
+                                        {"CompOp": {"val": "=="}},
                                         {"IntLiteral": {"val": 3}}
                                     ]
                                 }
@@ -689,10 +687,10 @@
                                 }
                             },
                             {
-                                "Factor": {
+                                "Comparison": {
                                     "sub_nodes": [
                                         {"Identifier": {"name": "x"}},
-                                        {"PowOp": {"val": "=="}},
+                                        {"CompOp": {"val": "=="}},
                                         {"IntLiteral": {"val": 4}}
                                     ]
                                 }
@@ -703,7 +701,7 @@
                                     "sub_nodes": [
                                         {"Identifier": {"name": "y"}},
                                         {
-                                            "Expr": {
+                                            "ArithmExpr": {
                                                 "sub_nodes": [
                                                     {
                                                         "UnaryMinus": {
@@ -733,10 +731,10 @@
                     "IfElse": {
                         "sub_nodes": [
                             {
-                                "Factor": {
+                                "Comparison": {
                                     "sub_nodes": [
                                         { "Identifier":  {"name":  "x"}},
-                                        { "PowOp": { "val":  "==" }},
+                                        { "CompOp": { "val":  "==" }},
                                         { "IntLiteral":  { "val":  6}}
                                     ]
                                 }
@@ -765,7 +763,7 @@
                                             "IfElse": {
                                                 "sub_nodes": [
                                                     {
-                                                        "Factor": {
+                                                        "Comparison": {
                                                             "sub_nodes": [
                                                                 {
                                                                     "Identifier": {
@@ -773,7 +771,7 @@
                                                                     }
                                                                 },
                                                                 {
-                                                                    "PowOp": {
+                                                                    "CompOp": {
                                                                         "val": "=="
                                                                     }
                                                                 },
@@ -852,10 +850,10 @@
                                 }
                             },
                             {
-                                "Factor": {
+                                "Comparison": {
                                     "sub_nodes": [
                                         { "Identifier":  { "name":  "x"}},
-                                        { "PowOp":  {"val":  "=="}},
+                                        { "CompOp":  {"val":  "=="}},
                                         { "IntLiteral":  { "val":  7}}
                                     ]
                                 }
@@ -873,7 +871,7 @@
                                             }
                                         },
                                         {
-                                            "Expr": {
+                                            "ArithmExpr": {
                                                 "sub_nodes": [
                                                     {
                                                         "Term": {
@@ -907,10 +905,10 @@
                                             }
                                         },
                                         {
-                                            "Factor": {
+                                            "Comparison": {
                                                 "sub_nodes": [
                                                     {
-                                                        "Expr": {
+                                                        "ArithmExpr": {
                                                             "sub_nodes": [
                                                                 { "IntLiteral":  {"val": 6} },
                                                                 { "AddOp":  {"val": "+"} },
@@ -918,7 +916,7 @@
                                                             ]
                                                         }
                                                     },
-                                                    { "PowOp": {"val": "=="} },
+                                                    { "CompOp": {"val": "=="} },
                                                     {
                                                         "Term": {
                                                             "sub_nodes": [
@@ -1065,13 +1063,13 @@
                     "WhileLoop": {
                         "sub_nodes": [
                             {
-                                "Term": {
+                                "Disjunction": {
                                     "sub_nodes": [
                                         {
-                                            "Factor": {
+                                            "Comparison": {
                                                 "sub_nodes": [
                                                     { "Identifier": { "name": "x" } },
-                                                    { "PowOp": { "val": "==" } },
+                                                    { "CompOp": { "val": "==" } },
                                                     {
                                                         "AddrExpr": {
                                                             "sub_nodes": [
@@ -1083,12 +1081,11 @@
                                                 ]
                                             }
                                         },
-                                        { "MulOp": { "val": "OR" } },
                                         {
-                                            "Factor": {
+                                            "Comparison": {
                                                 "sub_nodes": [
                                                     { "IntLiteral": { "val": 9 } },
-                                                    { "PowOp": { "val": "==" } },
+                                                    { "CompOp": { "val": "==" } },
                                                     { "IntLiteral": { "val": 0 } }
                                                 ]
                                             }
@@ -1105,7 +1102,7 @@
                                                 "sub_nodes": [
                                                     { "Identifier": { "name": "x" } },
                                                     {
-                                                        "Expr": {
+                                                        "ArithmExpr": {
                                                             "sub_nodes": [
                                                                 { "StrLiteral": { "val": "no " } },
                                                                 { "AddOp": { "val": "+" } },
@@ -1149,13 +1146,13 @@
                     "WhileLoop": {
                         "sub_nodes": [
                             {
-                                "Expr": {
+                                "Comparison": {
                                     "sub_nodes": [
+                                        {"Identifier": {"name": "x"}},
+                                        {"CompOp": {"val": "=="}},
                                         {
-                                            "Factor": {
+                                            "ArithmExpr": {
                                                 "sub_nodes": [
-                                                    {"Identifier": {"name": "x"}},
-                                                    {"PowOp": {"val": "=="}},
                                                     {
                                                         "AddrExpr": {
                                                             "sub_nodes": [
@@ -1163,20 +1160,13 @@
                                                                 {"Identifier": {"name": "z"}}
                                                             ]
                                                         }
-                                                    }
-                                                ]
+                                                    },
+                                                    {"AddOp": {"name": "+"}},
+                                                    {"Identifier": {"name": "j"}}                                                ]
                                             }
                                         },
-                                        {"AddOp": {"name": "+"}},
-                                        {
-                                            "Factor": {
-                                                "sub_nodes": [
-                                                    {"Identifier": {"name": "j"}},
-                                                    {"PowOp": {"val": "=="}},
-                                                    {"Identifier": {"name": "k"}}
-                                                ]
-                                            }
-                                        }
+                                        {"CompOp": {"val": "=="}},
+                                        {"Identifier": {"name": "k"}}
                                     ]
                                 }
                             },
@@ -1196,10 +1186,10 @@
                                             "WhileLoop": {
                                                 "sub_nodes": [
                                                     {
-                                                        "Factor": {
+                                                        "Comparison": {
                                                             "sub_nodes": [
                                                                 {"Identifier": {"name": "a"}},
-                                                                {"PowOp": {"val": "!="}},
+                                                                {"CompOp": {"val": "!="}},
                                                                 {"Identifier": {"name": "b"}}
                                                             ]
                                                         }
@@ -1210,7 +1200,7 @@
                                                             "sub_nodes": [
                                                                 {"Identifier": {"name": "x"}},
                                                                 {
-                                                                    "Expr": {
+                                                                    "ArithmExpr": {
                                                                         "sub_nodes": [
                                                                             {"Identifier": {"name": "y"}},
                                                                             {"AddOp": {"val": "+"}},
@@ -1273,10 +1263,10 @@
                                 }
                             },
                             {
-                                "Factor": {
+                                "Comparison": {
                                     "sub_nodes": [
                                         { "Identifier": { "name": "y" } },
-                                        { "PowOp": { "val": "==" } },
+                                        { "CompOp": { "val": "==" } },
                                         { "IntLiteral": { "val": 24 } }
                                     ]
                                 }
@@ -1319,7 +1309,7 @@
                                     "sub_nodes": [
                                         {"Identifier": {"name": "x"}},
                                         {
-                                            "Expr": {
+                                            "ArithmExpr": {
                                                 "sub_nodes": [
                                                     {"IntLiteral": {"val": 45454}},
                                                     {"AddOp": {"val": "+"}},
@@ -1430,10 +1420,10 @@
                     "IfElse": {
                         "sub_nodes": [
                             {
-                                "Factor": {
+                                "Comparison": {
                                     "sub_nodes": [
                                         {"Identifier": {"name": "x"}},
-                                        {"PowOp": {"val": "=="}},
+                                        {"CompOp": {"val": "=="}},
                                         {"IntLiteral": {"val": 0}}
                                     ]
                                 }
@@ -1461,7 +1451,7 @@
                                                         "Factor": {
                                                             "sub_nodes": [
                                                                 {
-                                                                    "Expr": {
+                                                                    "ArithmExpr": {
                                                                         "sub_nodes": [
                                                                             {"Identifier": {"name": "x"}},
                                                                             {"AddOp": {"val": "+"}},
@@ -1481,10 +1471,10 @@
                                 }
                             },
                             {
-                                "Factor": {
+                                "Comparison": {
                                     "sub_nodes": [
                                         {"Identifier": {"name": "x"}},
-                                        {"PowOp": {"val": "=="}},
+                                        {"CompOp": {"val": "=="}},
                                         {
                                             "AddrExpr": {
                                                 "sub_nodes": [
@@ -1522,10 +1512,10 @@
                                                         "WhileLoop": {
                                                             "sub_nodes": [
                                                                 {
-                                                                    "Factor": {
+                                                                    "Comparison": {
                                                                         "sub_nodes": [
                                                                             {"Identifier": {"name": "j"}},
-                                                                            {"PowOp": {"val": "<="}},
+                                                                            {"CompOp": {"val": "<="}},
                                                                             {
                                                                                 "Term": {
                                                                                     "sub_nodes": [
@@ -1578,7 +1568,7 @@
                                                                                     "sub_nodes": [
                                                                                         {"Identifier": {"name": "j"}},
                                                                                         {
-                                                                                            "Expr": {
+                                                                                            "ArithmExpr": {
                                                                                                 "sub_nodes": [
                                                                                                     {"Identifier": {"name": "j"}},
                                                                                                     {"AddOp": {"val": "+"}},
@@ -1599,10 +1589,10 @@
                                             }
                                         },
                                         {
-                                            "Factor": {
+                                            "Comparison": {
                                                 "sub_nodes": [
                                                     {"Identifier": {"name": "x"}},
-                                                    {"PowOp": {"val": "!="}},
+                                                    {"CompOp": {"val": "!="}},
                                                     {
                                                         "AddrExpr": {
                                                             "sub_nodes": [
@@ -1639,7 +1629,7 @@
                             { "Identifier": { "name": "x" } },
                             { "Identifier": { "name": "y" } },
                             {
-                                "Expr": {
+                                "ArithmExpr": {
                                     "sub_nodes": [
                                         { "Identifier": { "name": "x" } },
                                         { "AddOp": { "val": "+" } },
@@ -1648,7 +1638,7 @@
                                 }
                             },
                             {
-                                "Expr": {
+                                "ArithmExpr": {
                                     "sub_nodes": [
                                         {
                                             "Factor": {
@@ -1721,7 +1711,7 @@
                                 "ReturnInstr": {
                                     "sub_nodes": [
                                         {
-                                            "Expr": {
+                                            "ArithmExpr": {
                                                 "sub_nodes": [
                                                     { "Identifier": { "name": "a" } },
                                                     { "AddOp": { "val": "+" } },
@@ -1802,7 +1792,7 @@
                                                                         "sub_nodes": [
                                                                             { "Identifier": {"name": "b"}},
                                                                             {
-                                                                                "Expr": {
+                                                                                "ArithmExpr": {
                                                                                     "sub_nodes": [
                                                                                         { "Identifier": {"name": "b"}},
                                                                                         { "AddOp": {"val": "+"}},
@@ -1817,10 +1807,10 @@
                                                                     "IfElse": {
                                                                         "sub_nodes": [
                                                                             {
-                                                                                "Factor": {
+                                                                                "Comparison": {
                                                                                     "sub_nodes": [
                                                                                         { "Identifier": {"name": "a"}},
-                                                                                        { "PowOp": {"val": "<"}},
+                                                                                        { "CompOp": {"val": "<"}},
                                                                                         { "Identifier": {"name": "b"}}
                                                                                     ]
                                                                                 }
@@ -1834,7 +1824,7 @@
                                                                                                 "sub_nodes": [
                                                                                                     { "Identifier": {"name": "a"}},
                                                                                                     {
-                                                                                                        "Expr": {
+                                                                                                        "ArithmExpr": {
                                                                                                             "sub_nodes": [
                                                                                                                 {"Identifier": {"name": "a"}},
                                                                                                                 {"AddOp": {"val": "+"}},
@@ -1866,10 +1856,10 @@
                                                                                 }
                                                                             },
                                                                             {
-                                                                                "Factor": {
+                                                                                "Comparison": {
                                                                                     "sub_nodes": [
                                                                                         {"Identifier": {"name": "a"}},
-                                                                                        {"PowOp": {"val": "=="}},
+                                                                                        {"CompOp": {"val": "=="}},
                                                                                         {"Identifier": {"name": "b"}}
                                                                                     ]
                                                                                 }
@@ -1895,10 +1885,10 @@
                                                                                             }
                                                                                         },
                                                                                         {
-                                                                                            "Factor": {
+                                                                                            "Comparison": {
                                                                                                 "sub_nodes": [
                                                                                                     {"Identifier": {"name": "c"}},
-                                                                                                    {"PowOp": {"val": "=="}},
+                                                                                                    {"CompOp": {"val": "=="}},
                                                                                                     {"Identifier": {"name": "a"}}
                                                                                                 ]
                                                                                             }
@@ -1920,7 +1910,7 @@
                                             "ReturnInstr": {
                                                 "sub_nodes": [
                                                     {
-                                                        "Expr": {
+                                                        "ArithmExpr": {
                                                             "sub_nodes": [
                                                                 {"Identifier": {"name": "a"}},
                                                                 {"AddOp": {"val": "+"}},
@@ -2185,7 +2175,7 @@
                                                 "sub_nodes": [
                                                     {"Identifier": {"name": "result"}},
                                                     {
-                                                        "Expr": {
+                                                        "ArithmExpr": {
                                                             "sub_nodes": [
                                                                 {"Identifier": {"name": "a"}},
                                                                 {"AddOp": {"val": "+"}},
@@ -2308,7 +2298,7 @@
                                 "CastInt": {
                                     "sub_nodes": [
                                         {
-                                            "Expr": {
+                                            "ArithmExpr": {
                                                 "sub_nodes": [
                                                     {
                                                         "AddrExpr": {
@@ -2469,7 +2459,7 @@
                                 "WriteLine": {
                                     "sub_nodes": [
                                         {
-                                            "Expr": {
+                                            "ArithmExpr": {
                                                 "sub_nodes": [
                                                     {"StrLiteral": {"val": "another"}},
                                                     {"AddOp": {"val": "+"}},
@@ -2701,7 +2691,7 @@
                                     "sub_nodes": [
                                         {"Identifier": {"name": "A"}},
                                         {
-                                            "Expr": {
+                                            "ArithmExpr": {
                                                 "sub_nodes": [
                                                     {"StrLiteral": {"val": "a"}},
                                                     {"AddOp": {"val": "+"}},

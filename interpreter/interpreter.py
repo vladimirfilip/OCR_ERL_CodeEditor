@@ -13,6 +13,10 @@ import logging
 
 class Interpreter:
     def __init__(self, lines: Iterable[str]):
+        """
+        Sets up logging and initialises lexer, parser and executor with input source code lines
+        :param lines: iterable of strings
+        """
         logging.basicConfig(filename="interpreterlog.log", format="[%(asctime)s %(levelname)s] %(message)s", level=logging.DEBUG)
         self.source_code: list[str] = []
         self.parse_begin_time = None
@@ -26,6 +30,13 @@ class Interpreter:
         self.__executor.execute()
 
     def on_error(self, e: Exception, source_code_indices: list[int], post_parse: bool):
+        """
+        Formats the error message by including the lines in the original source code in which the error took place
+        :param e: the exception
+        :param source_code_indices: the indices of the erroneous source code lines
+        :param post_parse: True if error was thrown during execution, else False
+        :return: None
+        """
         heading = f"Error in parsing:" if not post_parse else f"Error during execution:"
         code_snippet = self.get_formatted_source_code_lines(source_code_indices)
         ex_msg = f"{e.__class__.__name__}: {str(e)}"
@@ -40,6 +51,12 @@ class Interpreter:
         exit(-1)
 
     def on_executor_error(self, e: Exception, nodes: list[Node]):
+        """
+        Obtains the erroneous lines of source code baed on the erroneous nodes
+        :param e: the exception
+        :param nodes: erroneous nodes
+        :return: None
+        """
         source_code_indices = []
         for node in nodes:
             source_code_indices += list(range(node.line_index, node.end_line_index + 1))
@@ -47,6 +64,11 @@ class Interpreter:
         self.on_error(e, source_code_indices, post_parse=True)
 
     def on_parse_finish(self, ast_node: Node):
+        """
+        Logs how long parsing took and the AST produced in JSON form
+        :param ast_node: the root of produced AST
+        :return: None
+        """
         logging.debug(f" ### FINISHED PARSING IN {time() - self.parse_begin_time} seconds ###")
         logging.debug(f"COMPLETE SOURCE CODE")
         formatted_source_code = self.get_formatted_source_code_lines(list(range(len(self.source_code))))
@@ -59,6 +81,11 @@ class Interpreter:
         self.parse_begin_time = time()
 
     def get_formatted_source_code_lines(self, indices: list[int]) -> list[str]:
+        """
+        Formats source code lines, adding line number
+        :param indices: source code line indices
+        :return: list of formatted strings
+        """
         result = []
         for i, n in enumerate(indices):
             if i > 0 and indices[i - 1] < n - 1:

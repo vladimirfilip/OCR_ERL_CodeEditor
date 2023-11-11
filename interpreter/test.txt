@@ -1,0 +1,6 @@
+x = int(input("E: "))
+if 0 < x < 10 then
+	print("GOOD")
+else
+	print("BAD")
+endif

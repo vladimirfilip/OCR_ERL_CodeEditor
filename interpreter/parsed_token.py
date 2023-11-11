@@ -254,8 +254,8 @@ for __t, __v in KNOWN_TOKENS.items():
 
 
 class ParsedToken:
-    __t_text: str
-    __t_content: Optional[TokenContents]
+    __t_text: str = ""
+    __t_content: Optional[TokenContents] = None
     __t_val: TokenVals
     __line_index: int
 
@@ -278,9 +278,9 @@ class ParsedToken:
 
     def __str__(self):
         if self.content:
-            result = f"'{self.content.value}'"
+            result = self.content.value
         elif self.val:
-            suffix: str = "" if self.text is None else f"['{self.text}']"
+            suffix: str = "" if not self.text else f"['{self.text}']"
             result = f"{self.val.name}{suffix}"
         elif self.text:
             result = f"'{self.text}'"

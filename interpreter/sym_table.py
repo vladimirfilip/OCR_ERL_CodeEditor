@@ -24,7 +24,7 @@ class NullVal:
 
 
 class ArrayVal:
-    """Representation of an array value in the symbol table."""
+    """Representation of an array value in the symbol table. Stores all values in a contiguous array and its dimensions"""
 
     dims: list[int]
     vals: list[V]
@@ -121,9 +121,6 @@ class ArrayVal:
 
     @staticmethod
     def stringify_list(vals: list[V]) -> str:
-        #
-        # Casts any object values of a type present in types_to_cast to string
-        #
         casted_values = []
         for val in vals:
             if type(val) == str:
@@ -240,6 +237,9 @@ class SymAddr:
 
 
 class SymRef(SymAddr):
+    """
+    An indirect address, i.e. an address to an address, or a reference to the original symbol.
+    """
     def __init__(self, tbl: 'SymTable', name: str, addr: SymAddr = None):
         super().__init__(tbl, name)
         self.__addr = None
@@ -297,11 +297,7 @@ class SymTable(Dict[str, V]):
 
     It is a hierarchical dictionary of (name, value) correspondence, each 'name' representing a variable, and each 'value' the value associated with it.
 
-    Each symbol table has a reference to its parent table (if any), the root symbol table (defined as the table with no parent) and a collection of sub-tables. Each sub-table
-    is identified by a key, usually the name of the element (class, function, variable) that defines the sub-context represented by the sub-table.
-
-    Important: creating sub-tables should go via SymTable.sub_table_from() via a 'with' statement. This class has the auto-closing mechanism in place which removes circular
-               references before removing the object from
+    Each symbol table has a reference to its parent table (if any) and the root symbol table (defined as the table with no parent)
     """
 
     parent: 'SymTable'
@@ -326,7 +322,7 @@ class SymTable(Dict[str, V]):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
-    def close(self, recursive: bool = False):
+    def close(self):
         """Closes the object by removing circular references to parent and root symbol tables."""
         self.__root = None
         self.parent = None
@@ -354,7 +350,7 @@ class SymTable(Dict[str, V]):
 
         :param name: symbol to address via the returned instance.
         :param indexes: list of indexes to address locations within the array associated with the symbol. It must be None for scalars and non-empty for arrays.
-        :param may_be_ref: True if the address may be a SymAddr instance, False otherwise
+        :param may_be_ref: True if the address should be a SymRef instance if its value is a SymAddr instance, False otherwise
         :return: address within the current symbol table.
         """
         if may_be_ref and isinstance(self.lookup_symbol(name), SymAddr):
@@ -424,6 +420,13 @@ class SymTable(Dict[str, V]):
         return result
 
     def lookup_symbol_with_table(self, name: str) -> Optional[Tuple[V, 'SymTable']]:
+        """
+        Gets the value associated with the given name, along with the table in which it was found, in
+        the symbol table hierarchy starting from the current table going to the root table.
+
+        :param name: symbol to get the value for. It may not be None.
+        :return: value associated with the symbol and the table in which it was found, if found, else None.
+        """
         sym_table = self
         while name not in sym_table and sym_table.parent is not None:
             sym_table = sym_table.parent
@@ -437,6 +440,9 @@ class SymTable(Dict[str, V]):
 
 
 class ObjSymTable(SymTable):
+    """
+    A subclass of SymTable, adding utility methods for allocating members at instantiation and for tracking which members are private.
+    """
     def __init__(self, parent: SymTable, storage_key: str, class_name: str):
         super().__init__(parent)
         self.class_name = class_name

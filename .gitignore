@@ -1,4 +1,4 @@
 /interpreterlog.log
 /t.txt
 *.pyc
-/interpreter_dependencies/interpreterlog.log
+/interpreter/interpreterlog.log

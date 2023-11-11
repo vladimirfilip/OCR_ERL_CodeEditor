@@ -18,6 +18,7 @@ class Lexer:
         """
         self.__tokenizer = tokenizer
         self.__tokens = self.__tokenizer.tokenize(lines)
+        self.__buf = []
 
     def next(self) -> Optional[ParsedToken]:
         """Gets the next token, associated with its token value.

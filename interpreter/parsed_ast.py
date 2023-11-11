@@ -169,6 +169,18 @@ class ExprList(Node):
     pass
 
 
+class Disjunction(Node):
+    pass
+
+
+class Comparison(Node):
+    pass
+
+
+class ArithmExpr(Node):
+    pass
+
+
 class Term(Node):
     pass
 
@@ -196,7 +208,7 @@ class Op(Node):
 
 
 class AddOp(Op):
-    ADD_OP_VALS: list[TokenVals] = [TokenVals.PLUS, TokenVals.MINUS, TokenVals.AND]
+    ADD_OP_VALS: list[TokenVals] = [TokenVals.PLUS, TokenVals.MINUS]
 
     def __init__(self, line_index, val: TokenVals):
         super().__init__(line_index, val)
@@ -204,7 +216,7 @@ class AddOp(Op):
 
 
 class MulOp(Op):
-    MUL_OP_VALS: list[TokenVals] = [TokenVals.MUL, TokenVals.INT_DIV, TokenVals.MOD, TokenVals.DIV, TokenVals.OR]
+    MUL_OP_VALS: list[TokenVals] = [TokenVals.MUL, TokenVals.INT_DIV, TokenVals.MOD, TokenVals.DIV]
 
     def __init__(self, line_index, val: TokenVals):
         super().__init__(line_index, val)
@@ -212,12 +224,20 @@ class MulOp(Op):
 
 
 class PowOp(Op):
-    POW_OP_VALS: list[TokenVals] = [TokenVals.POW, TokenVals.EQ, TokenVals.NEQ, TokenVals.GREATER, TokenVals.GREATER_EQ,
-                                    TokenVals.LOWER, TokenVals.LOWER_EQ]
+    POW_OP_VALS: list[TokenVals] = [TokenVals.POW]
 
     def __init__(self, line_index, val: TokenVals):
         super().__init__(line_index, val)
         assert val in PowOp.POW_OP_VALS
+
+
+class CompOp(Op):
+    COMP_OP_VALS: list[TokenVals] = [TokenVals.EQ, TokenVals.NEQ, TokenVals.GREATER, TokenVals.GREATER_EQ,
+                                     TokenVals.LOWER, TokenVals.LOWER_EQ]
+
+    def __init__(self, line_index, val: TokenVals):
+        super().__init__(line_index, val)
+        assert val in CompOp.COMP_OP_VALS
 
 
 class UnaryMinus(Node):

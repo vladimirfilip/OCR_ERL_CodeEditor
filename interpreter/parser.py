@@ -4,9 +4,9 @@ from parsed_ast import Node, Program, ProgramBlock, InstrBlock, Instr, ArrayDecl
     CallableSuffix, IntLiteral, AddrIdOrCall, AddOp, MulOp, UnaryMinus, UnaryNot, PowOp, IfElse, ElseIf, \
     InnerInstrBlock, GoToInstr, SwitchCase, ForLoop, WhileLoop, DoUntil, StrLiteral, NumLiteral, PrintInstr, \
     FunDecl, ParamList, Param, ReturnInstr, ProcDecl, FunExpr, CastStr, CastInt, CastFloat, Input, Length, StrSubstring, ClassDecl, ClassBlock, ClassMember, AttrDecl, \
-    EndOfFile, ReadLine, WriteLine, FileClose, OpenRead, OpenWrite, NewExpr, BoolLiteral
+    EndOfFile, ReadLine, WriteLine, FileClose, OpenRead, OpenWrite, NewExpr, BoolLiteral, CompOp, Disjunction, Comparison, ArithmExpr
 from lexer import Lexer
-from parsed_token import TokenVals, ParsedToken, TokenContents
+from parsed_token import TokenVals, ParsedToken, TokenContents, KNOWN_TOKEN_VALS
 
 
 class Parser:
@@ -25,7 +25,7 @@ class Parser:
             self.on_parse_begin()
         if (next_token := self.__lexer.next()) is not None:
             self.curr_line_index = next_token.line_index
-            self.__raise_error(SyntaxError(f"Unexpected '{next_token}'"))
+            self.__raise_error(SyntaxError(f"Unexpected {next_token}"))
         if self.on_parse_finish is not None:
             self.on_parse_finish(result)
         return result
@@ -261,15 +261,54 @@ class Parser:
         #
         prev_id_or_call = ctx.pop(AddrIdOrCall.IS_INSTR, False)
         result: Optional[Expr] = None
-        term: Optional[Term] = self.__term(ctx)
-        if term is not None:
-            result = Expr(term.line_index).add_sub_node(term)
-            while (op_node := self.__token_add_op()) is not None:
-                result.add_sub_node(op_node)
+        if (disjunction := self.__disjunction(ctx)) is not None:
+            result = Expr(disjunction.line_index).add_sub_node(disjunction)
+            while self.__token_is(TokenVals.AND):
+                result.add_sub_node(self.__tree_expect(ctx,
+                                                       self.__disjunction,
+                                                       f"'{TokenContents.AND.value}' detected but no subsequent expression found"))
+        ctx[AddrIdOrCall.IS_INSTR] = prev_id_or_call
+        return result
+
+    def __disjunction(self, ctx: dict) -> Optional[Disjunction]:
+        result: Optional[Disjunction] = None
+        if (inversion := self.__inversion(ctx)) is not None:
+            result = Disjunction(inversion.line_index).add_sub_node(inversion)
+            while self.__token_is(TokenVals.OR):
+                result.add_sub_node(self.__tree_expect(ctx,
+                                                       self.__inversion,
+                                                       f"'{TokenContents.OR.value}' detected but no subsequent expression found"))
+        return result
+
+    def __inversion(self, ctx: dict) -> Optional[UnaryNot | Comparison]:
+        if self.__token_is(TokenVals.NOT):
+            self.__expect_no_newline()
+            return (UnaryNot(self.curr_line_index)
+                    .add_sub_node(self.__tree_expect(ctx,
+                                                     self.__comparison,
+                                                     f"'{TokenContents.NOT.value}' detected but no subsequent expression found")))
+        return self.__comparison(ctx)
+
+    def __comparison(self, ctx: dict) -> Optional[Comparison]:
+        result: Optional[Comparison] = None
+        if (arithm_expr := self.__arithm_expr(ctx)) is not None:
+            result = Comparison(arithm_expr.line_index).add_sub_node(arithm_expr)
+            while (comp_op := self.__token_comp_op()) is not None:
+                result.add_sub_node(comp_op)
+                result.add_sub_node(self.__tree_expect(ctx,
+                                                       self.__arithm_expr,
+                                                       f"'{KNOWN_TOKEN_VALS[comp_op.val].value}' detected but no subsequent expression found"))
+        return result
+
+    def __arithm_expr(self, ctx: dict) -> Optional[ArithmExpr]:
+        result: Optional[ArithmExpr] = None
+        if (term := self.__term(ctx)) is not None:
+            result = ArithmExpr(term.line_index).add_sub_node(term)
+            while (add_op := self.__token_add_op()) is not None:
+                result.add_sub_node(add_op)
                 result.add_sub_node(self.__tree_expect(ctx,
                                                        self.__term,
-                                                       f"Syntax error: '{op_node.val}' detected but no term found"))
-        ctx[AddrIdOrCall.IS_INSTR] = prev_id_or_call
+                                                       f"'{KNOWN_TOKEN_VALS[add_op.val].value}' detected but no subsequent expression found"))
         return result
 
     def __term(self, ctx: dict) -> Optional[Term]:
@@ -281,7 +320,7 @@ class Parser:
                 result.add_sub_node(op_node)
                 result.add_sub_node(self.__tree_expect(ctx,
                                                        self.__factor,
-                                                       f"Syntax error: '{op_node.val}' detected but no factor found"))
+                                                       f"'{KNOWN_TOKEN_VALS[op_node.val].value}' detected but no operand found"))
         return result
 
     def __factor(self, ctx: dict) -> Optional[Factor]:
@@ -293,7 +332,7 @@ class Parser:
                 result.add_sub_node(op_node)
                 result.add_sub_node(self.__tree_expect(ctx,
                                                        self.__simple_expr,
-                                                       f"Syntax error: '{op_node.val}' detected but no factor found"))
+                                                       f"'{KNOWN_TOKEN_VALS[op_node.val].value}' detected but no operand found"))
         return result
 
     def __simple_expr(self, ctx: dict) -> Optional[Node]:
@@ -305,15 +344,11 @@ class Parser:
             return UnaryMinus(self.curr_line_index).add_sub_node(self.__tree_expect(ctx,
                                                                                     self.__simple_expr,
                                                                                     f"'{TokenContents.MINUS.value}' detected but no subsequent expression found"))
-        if self.__token_is(TokenVals.NOT):
-            self.__expect_no_newline()
-            return UnaryNot(self.curr_line_index).add_sub_node(self.__tree_expect(ctx,
-                                                                                  self.__simple_expr,
-                                                                                  f"'{TokenContents.NOT.value}' detected but no subsequent expression found"))
+
         if self.__token_is(TokenVals.OPEN_PAREN):
             expr: Node = self.__tree_expect(ctx,
                                             self.__expr,
-                                            f" '{TokenContents.OPEN_PAREN.value}' detected but no subsequent expression found")
+                                            f"'{TokenContents.OPEN_PAREN.value}' detected but no subsequent expression found")
             self.__token_must_be(TokenContents.CLOSED_PAREN, TokenVals.CLOSED_PAREN)
             expr.line_index = self.curr_line_index
             return expr
@@ -377,7 +412,7 @@ class Parser:
             fun_node_line_index: int = self.curr_line_index
             result = fun_node_type(fun_node_line_index).add_sub_node(self.__tree_expect(ctx,
                                                                                         self.__expr,
-                                                                                        err_msg="Syntax error: built-in function call requires an expression argument"))
+                                                                                        err_msg="built-in function call requires an expression argument"))
             self.__token_must_be(TokenContents.CLOSED_PAREN, TokenVals.CLOSED_PAREN)
             return result
         return None
@@ -576,7 +611,7 @@ class Parser:
             while self.__token_is(TokenVals.COMMA, same_line=True):
                 result.add_sub_node(self.__tree_expect(ctx,
                                                        self.__param,
-                                                       "Comma found but no argument present"))
+                                                       f"'{TokenContents.COMMA.value}' found but no argument present"))
         return result
 
     def __param(self, ctx: dict) -> Optional[Param]:
@@ -694,7 +729,7 @@ class Parser:
             self.__expect_no_newline()
             return self.__tree_expect(ctx,
                                       self.__expr,
-                                      "Value required when assigning a value to an class attribute")
+                                      f"'{TokenContents.EQUALS.value}' detected but no subsequent value found")
 
     # ------------------------------------------------------------------------------------------------------------------------------------------------------------------- #
 
@@ -717,8 +752,8 @@ class Parser:
         """
         t: ParsedToken = self.__lexer.next()
         if t:
-            if t.val in [TokenVals.PLUS, TokenVals.MINUS, TokenVals.AND]:
-                assert t.text in [TokenContents.PLUS.value, TokenContents.MINUS.value, TokenContents.AND.value]
+            if t.val in [TokenVals.PLUS, TokenVals.MINUS]:
+                assert t.text in [TokenContents.PLUS.value, TokenContents.MINUS.value]
                 self.curr_line_index = t.line_index
                 return AddOp(self.curr_line_index, t.val)
             self.__lexer.push_front(t)
@@ -731,9 +766,9 @@ class Parser:
         """
         t: ParsedToken = self.__lexer.next()
         if t:
-            if t.val in [TokenVals.MUL, TokenVals.DIV, TokenVals.INT_DIV, TokenVals.MOD, TokenVals.OR]:
+            if t.val in [TokenVals.MUL, TokenVals.DIV, TokenVals.INT_DIV, TokenVals.MOD]:
                 assert t.text in [TokenContents.MUL.value, TokenContents.DIV.value, TokenContents.INT_DIV.value,
-                                  TokenContents.MOD.value, TokenContents.OR.value]
+                                  TokenContents.MOD.value]
                 self.curr_line_index = t.line_index
                 return MulOp(self.curr_line_index, t.val)
             self.__lexer.push_front(t)
@@ -742,18 +777,31 @@ class Parser:
     def __token_pow_op(self) -> Optional[PowOp]:
         """Checks that the next token is an index-level operator and if so, it returns its AST node
 
-        :return: a MulOp node if matching, None otherwise
+        :return: a PowOp node if matching, None otherwise
         """
         t: ParsedToken = self.__lexer.next()
         if t:
-            if t.val in [TokenVals.POW, TokenVals.EQ, TokenVals.GREATER, TokenVals.GREATER_EQ, TokenVals.LOWER,
-                         TokenVals.LOWER_EQ, TokenVals.NEQ]:
-                assert t.text in [TokenContents.POW.value, TokenContents.EQ.value, TokenContents.GREATER.value,
-                                  TokenContents.GREATER_EQ.value, TokenContents.LOWER.value,
-                                  TokenContents.LOWER_EQ.value,
-                                  TokenContents.NEQ.value]
+            if t.val in [TokenVals.POW]:
+                assert t.text in [TokenContents.POW.value]
                 self.curr_line_index = t.line_index
                 return PowOp(self.curr_line_index, t.val)
+            self.__lexer.push_front(t)
+        return None
+
+    def __token_comp_op(self) -> Optional[CompOp]:
+        """Checks that the next token is a comparison operator and if so, it returns its AST node
+
+        :return: a CompOp node if matching, None otherwise
+        """
+        t: ParsedToken = self.__lexer.next()
+        if t:
+            if t.val in [TokenVals.EQ, TokenVals.NEQ, TokenVals.GREATER, TokenVals.GREATER_EQ,
+                         TokenVals.LOWER, TokenVals.LOWER_EQ]:
+                assert t.text in [TokenContents.EQ.value, TokenContents.NEQ.value, TokenContents.GREATER.value,
+                                  TokenContents.GREATER_EQ.value, TokenContents.LOWER.value,
+                                  TokenContents.LOWER_EQ.value]
+                self.curr_line_index = t.line_index
+                return CompOp(self.curr_line_index, t.val)
             self.__lexer.push_front(t)
         return None
 
@@ -769,7 +817,7 @@ class Parser:
         if t:
             if t.val == val:
                 if same_line and not self.__token_on_same_line(t):
-                    self.__raise_error(SyntaxError(f"{t} should be not be on a separate line"))
+                    self.__raise_error(SyntaxError(f"'{t}' should be not be on a separate line"))
                 self.curr_line_index = t.line_index
                 return t.text
             self.__lexer.push_front(t)
@@ -816,15 +864,16 @@ class Parser:
         :return: token string.
         """
         t: ParsedToken = self.__lexer.next()
+        expected_t = ParsedToken().set_val(val)
         if t:
             if t.val == val:
                 if same_line and not self.__token_on_same_line(t):
-                    self.__raise_error(SyntaxError(f"{t} should not be in a separate line"))
+                    self.__raise_error(SyntaxError(f"'{t}' should not be in a separate line"))
                 self.curr_line_index = t.line_index
                 return t.text
             else:
-                self.__raise_error(SyntaxError(f"Expected '{val.name.lower()}', received '{t.val.name.lower()}'"))
-        self.__raise_error(SyntaxError(f"Expected '{val.name.lower()}' before end of file"))
+                self.__raise_error(SyntaxError(f"Expected '{expected_t}', received '{t}'"))
+        self.__raise_error(SyntaxError(f"Expected '{expected_t}' before end of file"))
 
     def __token_must_be(self, name: str | TokenContents, val: TokenVals, same_line: bool = False):
         """Enforces that the upcoming token is of given name and value.
@@ -846,7 +895,7 @@ class Parser:
         t: Optional[ParsedToken] = self.__lexer.next()
         if t is not None:
             if self.__token_on_same_line(t):
-                self.__raise_error(SyntaxError(f"{t} should be on a new line"))
+                self.__raise_error(SyntaxError(f"'{t}' should be on a new line"))
             self.__lexer.push_front(t)
 
     def __expect_no_newline(self) -> None:
@@ -857,7 +906,7 @@ class Parser:
         t: Optional[ParsedToken] = self.__lexer.next()
         if t is not None:
             if not self.__token_on_same_line(t):
-                self.__raise_error(SyntaxError(f"{t} should not be in a new line"))
+                self.__raise_error(SyntaxError(f"'{t}' should not be in a new line"))
             self.__lexer.push_front(t)
 
     def __token_on_same_line(self, token: ParsedToken) -> bool:

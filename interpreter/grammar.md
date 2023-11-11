@@ -144,9 +144,26 @@ ExprList' -> ',' Expr ExprList' | ε
 
 OptionalExprList -> ExprList | ε
 
-Expr -> Term Expr'
+Expr -> Disjunction Expr'
 
-Expr' -> AddOp Term Expr' | ε
+Expr' -> 'AND' Disjunction Expr' | ε
+
+Disjunction -> Inversion Disjunction'
+
+Disjunction -> 'OR' Inversion Disjunction' | ε
+
+Inversion -> UnaryNot 
+            | Comparison
+
+UnaryNot -> 'NOT' Comparison
+
+Comparison -> ArithmExpr Comparison'
+
+Comparison' -> CompOp ArithmExpr Comparison' | ε
+
+ArithmExpr -> Term ArithmExpr'
+
+ArithmExpr' -> AddOp Term ArithmExpr' | ε
 
 Term -> Factor Term'
 
@@ -156,26 +173,25 @@ Factor -> SimpleExpr Factor'
 
 Factor' -> PowOp SimpleExpr Factor' | ε
 
-SimpleExpr -> UnaryNot
-        | UnaryMinus
-        | '(' Expr ')'
-        | AddrExpr
-        | NewExpr
-        | FunExpr
-        | NUM | INT | STRING
-        | 'true' | 'false'
-
-UnaryNot -> 'NOT' SimpleExpr
+SimpleExpr -> UnaryMinus
+            | '(' Expr ')'
+            | AddrExpr
+            | NewExpr
+            | FunExpr
+            | NUM | INT | STRING
+            | 'true' | 'false'
 
 UnaryMinus -> '-' SimpleExpr
 
 NewExpr -> 'new' ID '(' ExprList ')'
 
-AddOp -> '+' | '-' | 'AND'
+AddOp -> '+' | '-'
 
-MulOp -> '*' | '/' | 'OR' | 'MOD' | 'DIV'
+MulOp -> '*' | '/' | 'MOD' | 'DIV'
 
-PowOp -> '^' | '==' | '>' | '>=' | '<' | '<=' | '!=' 
+PowOp -> '^'
+
+CompOp -> '==' | '>' | '>=' | '<' | '<=' | '!='
 
 ### Built-in functions
 
