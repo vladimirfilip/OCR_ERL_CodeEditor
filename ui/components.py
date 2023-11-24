@@ -1,8 +1,41 @@
 from typing import Optional, Callable
 from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtGui import QTextCursor
-from PyQt6.QtWidgets import QPlainTextEdit
+from PyQt6.QtWidgets import QPlainTextEdit, QPushButton
 from PyQt6 import QtGui
+
+
+class Button(QPushButton):
+    def __init__(self, *args, **kwargs):
+        """
+        A child class of the PyQt PushButton class that sets the following characteristics through
+        the keyword arguments provided at instantiation:
+         - fixed width
+         - fixed height
+         - onclick event
+         - icon
+
+        :param args: arguments given at instantiation
+        :param kwargs: keyword arguments given at instantiation
+        """
+        reserved_kwargs = ["fixed_width", "fixed_height", "clicked", "icon"]
+        filtered_kwargs = {}
+        for k, v in kwargs.items():
+            if k not in reserved_kwargs:
+                filtered_kwargs[k] = v
+        super().__init__(*args, **filtered_kwargs)
+        arg_to_method = {
+            "fixed_width": self.setFixedWidth,
+            "fixed_height": self.setFixedHeight,
+            "clicked": self.clicked.connect,
+            "icon": self.setIcon,
+        }
+        assert list(arg_to_method.keys()) == reserved_kwargs, "No sync between reserved kwargs and associated methods"
+        for k in arg_to_method.keys():
+            if (proc_args := kwargs.pop(k, None)) is not None:
+                if type(proc_args) != list:
+                    proc_args = [proc_args]
+                arg_to_method[k](*proc_args)
 
 
 class InputTextBox(QPlainTextEdit):
@@ -10,7 +43,9 @@ class InputTextBox(QPlainTextEdit):
     Textbox in which source code input is added by the user. Contains some simple bindings
     so that the text input is constantly kept up-to-date
     """
+
     def __init__(self, *args, **kwargs):
+        self.outer_text_changed = kwargs.pop("text_changed", None)
         super().__init__(*args, **kwargs)
         self.textChanged.connect(self.on_text_changed)
         self.__text = ""
@@ -27,13 +62,15 @@ class InputTextBox(QPlainTextEdit):
 
     def on_text_changed(self):
         self.text = self.toPlainText()
+        self.outer_text_changed()
 
 
 class Terminal(QtWidgets.QPlainTextEdit):
     """
-    The widget where user interacts with the interpreter. Runs the interpeter and output from the interpreter is kept read-only, along with previous
+    The widget where user interacts with the interpreter. Runs the interpreter and output from the interpreter is kept read-only, along with previous
     inputs from the user.
     """
+
     def __init__(self, on_run_start: Optional[Callable] = None, on_run_end: Optional[Callable] = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         #

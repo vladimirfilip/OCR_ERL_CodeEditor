@@ -1,5 +1,5 @@
 import json
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, Optional
 from sys import argv, stderr
 from time import time
 from ast_executor import AstExecutor
@@ -63,7 +63,7 @@ class Interpreter:
         source_code_indices = sorted(list(set(source_code_indices)))
         self.on_error(e, source_code_indices, post_parse=True)
 
-    def on_parse_finish(self, ast_node: Node):
+    def on_parse_finish(self, ast_node: Optional[Node]):
         """
         Logs how long parsing took and the AST produced in JSON form
         :param ast_node: the root of produced AST
@@ -74,8 +74,9 @@ class Interpreter:
         formatted_source_code = self.get_formatted_source_code_lines(list(range(len(self.source_code))))
         for line in formatted_source_code:
             logging.debug(line)
-        ast_json = ASTToJsonParser().parse(ast_node)
-        logging.debug(json.dumps(ast_json, indent=4))
+        if ast_node is not None:
+            ast_json = ASTToJsonParser().parse(ast_node)
+            logging.debug(json.dumps(ast_json, indent=4))
 
     def on_parse_begin(self):
         self.parse_begin_time = time()
