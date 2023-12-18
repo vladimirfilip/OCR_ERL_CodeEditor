@@ -10,32 +10,39 @@ class Button(QPushButton):
         """
         A child class of the PyQt PushButton class that sets the following characteristics through
         the keyword arguments provided at instantiation:
-         - fixed width
-         - fixed height
-         - onclick event
-         - icon
+         - fixed_width for fixed width
+         - fixed_height for fixed height
+         - clicked for onclick event
+         - icon for the button icon
 
         :param args: arguments given at instantiation
         :param kwargs: keyword arguments given at instantiation
         """
-        reserved_kwargs = ["fixed_width", "fixed_height", "clicked", "icon"]
-        filtered_kwargs = {}
-        for k, v in kwargs.items():
-            if k not in reserved_kwargs:
-                filtered_kwargs[k] = v
-        super().__init__(*args, **filtered_kwargs)
-        arg_to_method = {
+        #
+        # Filters out reserved kwargs indicating instantiation characteristics,
+        # passing the rest into the superclass' constructor
+        #
+        reserved_keys: list[str] = ["fixed_width", "fixed_height", "clicked", "icon"]
+        rest_kwargs: dict = {k: v for k, v in kwargs.items() if k not in reserved_keys}
+        super().__init__(*args, **rest_kwargs)
+        #
+        # Dictionary storing the reserved kwarg key and the corresponding setter procedure
+        #
+        arg_to_method: dict[str, Callable] = {
             "fixed_width": self.setFixedWidth,
             "fixed_height": self.setFixedHeight,
             "clicked": self.clicked.connect,
             "icon": self.setIcon,
         }
-        assert list(arg_to_method.keys()) == reserved_kwargs, "No sync between reserved kwargs and associated methods"
-        for k in arg_to_method.keys():
-            if (proc_args := kwargs.pop(k, None)) is not None:
+        #
+        # Ensures that reserved kwargs remain consistent
+        #
+        assert list(arg_to_method.keys()) == reserved_keys, "No sync between reserved kwargs and associated methods"
+        for key, proc in arg_to_method.items():
+            if (proc_args := kwargs.pop(key, None)) is not None:
                 if type(proc_args) != list:
                     proc_args = [proc_args]
-                arg_to_method[k](*proc_args)
+                proc(*proc_args)
 
 
 class InputTextBox(QPlainTextEdit):
@@ -99,7 +106,6 @@ class Terminal(QtWidgets.QPlainTextEdit):
         program, rest_args = args[0], args[1:]
         self.process.setProgram(program)
         self.process.readyReadStandardOutput.connect(self.on_ready_read_std_output)
-        self.process.readyReadStandardError.connect(self.on_ready_read_std_err)
         self.process.setArguments(rest_args)
         self.process.start()
         self.process.finished.connect(self.on_process_end)
@@ -131,16 +137,6 @@ class Terminal(QtWidgets.QPlainTextEdit):
         out = self.process.readAllStandardOutput().data().decode().replace("\r", "")
         self.fixed_contents = self.toPlainText() + out
         self.insertPlainText(out)
-
-    @QtCore.pyqtSlot()
-    def on_ready_read_std_err(self):
-        """
-        Decodes standard error output from the running program and adds it to the terminal contents, displaying it to the user
-        :return:
-        """
-        err = "\n" + self.process.readAllStandardError().data().decode()
-        self.fixed_contents += self.toPlainText() + err
-        self.insertPlainText(err)
 
     def send_input(self, val: str):
         """

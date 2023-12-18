@@ -895,7 +895,7 @@ class Parser:
         t: Optional[ParsedToken] = self.__lexer.next()
         if t is not None:
             if self.__token_on_same_line(t):
-                self.__raise_error(SyntaxError(f"'{t}' should be on a new line"))
+                self.__raise_error(SyntaxError(f"Newline expected before '{t}'"))
             self.__lexer.push_front(t)
 
     def __expect_no_newline(self) -> None:

@@ -1,6 +1,6 @@
 import json
 from typing import Iterable, Iterator, Optional
-from sys import argv, stderr
+from sys import argv, stdout
 from time import time
 from ast_executor import AstExecutor
 from parsed_ast import Node
@@ -41,13 +41,13 @@ class Interpreter:
         code_snippet = self.get_formatted_source_code_lines(source_code_indices)
         ex_msg = f"{e.__class__.__name__}: {str(e)}"
         whole_msg = [heading] + code_snippet + [ex_msg]
-        max_line_len = max(len(line) for line in whole_msg)
-        whole_msg.insert(1, "-" * max_line_len)
-        whole_msg.insert(-1, "-" * max_line_len)
+        max_src_code_line_len = max(len(line) for line in code_snippet)
+        whole_msg.insert(1, "-" * max_src_code_line_len)
+        whole_msg.insert(-1, "-" * max_src_code_line_len)
         for line in whole_msg:
             logging.error(line)
-        stderr.write("\n".join(whole_msg) + "\n")
-        stderr.flush()
+        stdout.write("\n".join(whole_msg) + "\n")
+        stdout.flush()
         exit(-1)
 
     def on_executor_error(self, e: Exception, nodes: list[Node]):

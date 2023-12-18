@@ -277,6 +277,7 @@ class ParsedToken:
         return hash((self.text, self.content, self.val))
 
     def __str__(self):
+        result = ""
         if self.content:
             result = self.content.value
         elif self.val:
@@ -284,8 +285,7 @@ class ParsedToken:
             result = f"{self.val.name}{suffix}"
         elif self.text:
             result = f"'{self.text}'"
-        else:
-            result = "NOTHING"
+        assert result, "Token should not have empty contents"
         return result
 
     @property

@@ -8,10 +8,10 @@ from ui.styles import GLOBAL_STYLES
 
 class CodeEditor(QWidget):
     """
-    Base Code Editor widget, parent of all other widgets
+    Base Code Editor UI widget, parent of all other widgets
     """
     #
-    # file name of the text file to be used for passing input source code into the interpreter
+    # file name of the intermediary text file to be used for passing input source code into the interpreter
     #
     TEMP_FILENAME: str = "t.txt"
     #
@@ -31,8 +31,8 @@ class CodeEditor(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         #
-        # Initialises base vertical layout where input and output textboxes are stored at the top
-        # and buttons are placed at the bottom
+        # Initialises base vertical layout where open file path label, input and output textboxes
+        # and buttons are placed
         #
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
@@ -87,8 +87,8 @@ class CodeEditor(QWidget):
         self.btn_layout.addSpacing(file_btn_size + padding)
         self.btn_layout.addStretch()
         #
-        # Adds binding so that when terminal starts and ends execution the icon,
-        # the run button is set accordingly
+        # Adds binding so that when terminal starts and ends execution the icon of the
+        # run button is set accordingly
         #
         self.terminal.on_run_start = lambda: self.run_btn.setIcon(QtGui.QIcon("ui\\stop.png"))
         self.terminal.on_run_end = lambda: self.run_btn.setIcon(QtGui.QIcon("ui\\play.png"))
@@ -101,6 +101,8 @@ class CodeEditor(QWidget):
         self.layout.addLayout(self.btn_layout)
         self.setStyleSheet(GLOBAL_STYLES)
 
+        self.terminal.setPlainText("qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM!\"£$%^&*()_+1234567890-=[];'#,./{}:@~<>?¬`|\\")
+        self.terminal.clear()
     @staticmethod
     def set_button_styles(buttons: list[Button]):
         for button in buttons:
@@ -137,10 +139,7 @@ class CodeEditor(QWidget):
         #
         # Updates the open file label with a '*' if there are now unsaved changes
         #
-        if unsaved:
-            self.open_file_label.setText(self.open_file_path + "*")
-        else:
-            self.open_file_label.setText(self.open_file_path)
+        self.open_file_label.setText(self.open_file_path + ("*" if unsaved else ""))
         #
         # Sets static flag
         #
@@ -202,10 +201,14 @@ class CodeEditor(QWidget):
         If open_file_path is empty, a file dialog opens to allow user to choose save location.
         :return: None
         """
+        file_path = self.open_file_path
         if not self.open_file_path:
-            self.open_file_path = filedialog.asksaveasfilename(defaultextension=CodeEditor.SOURCE_FILE_EXTENSION)
-        with open(self.open_file_path, "w+") as file:
+            file_path = filedialog.asksaveasfilename(defaultextension=CodeEditor.SOURCE_FILE_EXTENSION)
+        if file_path is None:
+            return
+        with open(file_path, "w+") as file:
             file.write(self.text_edit.text)
+        self.open_file_path = file_path
         self.is_unsaved = False
 
     def on_new_file_btn_click(self):

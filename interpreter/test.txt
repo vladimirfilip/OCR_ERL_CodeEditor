@@ -1,6 +1,21 @@
-x = int(input("E: "))
-if 0 < x < 10 then
-	print("GOOD")
-else
-	print("BAD")
-endif
+function binarySearch(arr:byVal, target, l, r)
+	mid = (l + r) DIV 2
+	if target < arr[mid] then
+		return binarySearch(arr, target, l, mid)
+	elseif target == arr[mid] then
+		return mid
+	else
+		return binarySearch(arr, target, mid, r)
+	endif
+endfunction
+
+array arr[8]
+arr[0] = -1
+arr[1] = 0
+arr[2] = 3
+arr[3] = 8
+arr[4] = 10
+arr[5] = 18
+arr[6] = 26
+arr[7] = 12342
+print(binarySearch(arr, 18, 0, 8))

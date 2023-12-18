@@ -418,6 +418,13 @@ class AstExecutor:
         # Executing if and elseif statements
         #
         for i in range(0, len(sub_nodes), 2):
+            #
+            # If there is only one sub-node left, that sub-node represents an else statement
+            #
+            is_else = i + 1 >= len(sub_nodes)
+            if is_else:
+                self.__execute(sub_nodes[i], ctx)
+                return
             condition = sub_nodes[i]
             instr_block = sub_nodes[i + 1]
             evaluated_condition: T = self.__eval(condition, ctx)
@@ -426,11 +433,6 @@ class AstExecutor:
             if evaluated_condition:
                 self.__execute(instr_block, ctx)
                 return
-        #
-        # Executing else statement if it exists
-        #
-        if len(sub_nodes) % 2:
-            self.__execute(sub_nodes[-1], ctx)
 
     def __execute_switch_case(self, switch_case: SwitchCase, ctx: ExeCtx):
         """
