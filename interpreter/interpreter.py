@@ -17,7 +17,7 @@ class Interpreter:
         Sets up logging and initialises lexer, parser and executor with input source code lines
         :param lines: iterable of strings
         """
-        logging.basicConfig(filename="interpreterlog.log", format="[%(asctime)s %(levelname)s] %(message)s", level=logging.DEBUG)
+        logging.basicConfig(filename="interpreterlog.log", format="[%(asctime)s:%(created).9f %(levelname)s] %(message)s", level=logging.DEBUG)
         self.source_code: list[str] = []
         self.parse_begin_time = None
         self.__tokenizer = Tokenizer(on_new_line_input=lambda s: self.source_code.append(s))
