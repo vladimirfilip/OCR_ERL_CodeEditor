@@ -151,7 +151,7 @@ class TestSymTable(TestCase):
         self.sym_table = SymTable()
 
     def tearDown(self) -> None:
-        self.sym_table.close(True)
+        self.sym_table.close()
         self.sym_table = None
 
     def test_close(self):

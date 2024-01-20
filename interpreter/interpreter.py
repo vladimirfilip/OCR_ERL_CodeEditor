@@ -1,7 +1,7 @@
 import json
 from typing import Iterable, Iterator, Optional
 from sys import argv, stdout
-from time import time
+from time import time_ns
 from ast_executor import AstExecutor
 from parsed_ast import Node
 from lexer import Lexer
@@ -69,7 +69,7 @@ class Interpreter:
         :param ast_node: the root of produced AST
         :return: None
         """
-        logging.debug(f" ### FINISHED PARSING IN {time() - self.parse_begin_time} seconds ###")
+        logging.debug(f" ### FINISHED PARSING IN {time_ns() - self.parse_begin_time} nanoseconds ###")
         logging.debug(f"COMPLETE SOURCE CODE")
         formatted_source_code = self.get_formatted_source_code_lines(list(range(len(self.source_code))))
         for line in formatted_source_code:
@@ -79,7 +79,7 @@ class Interpreter:
             logging.debug(json.dumps(ast_json, indent=4))
 
     def on_parse_begin(self):
-        self.parse_begin_time = time()
+        self.parse_begin_time = time_ns()
 
     def get_formatted_source_code_lines(self, indices: list[int]) -> list[str]:
         """

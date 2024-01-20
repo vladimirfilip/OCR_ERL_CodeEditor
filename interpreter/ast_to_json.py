@@ -45,7 +45,6 @@ class ASTToJsonParser:
                 assert len(parent.__bases__) > 0, f"Type {parent.__name__} has no parent"
                 return translated_parent(parent.__bases__[0])
 
-
             assert len(typ.__bases__) > 0, f"Type {typ.__name__} has no parent"
             self.__NODE_HIERARCHY[typ] = translated_parent(typ.__bases__[0])
         return typ if not exclude_current and typ in self.__NODE_TRANSLATORS else self.__NODE_HIERARCHY[typ]
