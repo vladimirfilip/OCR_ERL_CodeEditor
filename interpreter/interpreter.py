@@ -29,6 +29,12 @@ class Interpreter:
         logging.debug("\n\n" + "#" * 50 + "\n" + "BEGINNING EXECUTION" + "\n" + "#" * 50)
         self.__executor.execute()
 
+    def log_full_source_code(self):
+        logging.debug(f"COMPLETE SOURCE CODE")
+        formatted_source_code = self.get_formatted_source_code_lines(list(range(len(self.source_code))))
+        for line in formatted_source_code:
+            logging.debug(line)
+
     def on_error(self, e: Exception, source_code_indices: list[int], post_parse: bool):
         """
         Formats the error message by including the lines in the original source code in which the error took place
@@ -39,6 +45,9 @@ class Interpreter:
         """
         heading = f"Error in parsing:" if not post_parse else f"Error during execution:"
         code_snippet = self.get_formatted_source_code_lines(source_code_indices)
+        if not post_parse:
+            self.log_full_source_code()
+            logging.debug("....")
         ex_msg = f"{e.__class__.__name__}: {str(e)}"
         whole_msg = [heading] + code_snippet + [ex_msg]
         max_src_code_line_len = max(len(line) for line in code_snippet)
@@ -70,10 +79,7 @@ class Interpreter:
         :return: None
         """
         logging.debug(f" ### FINISHED PARSING IN {time_ns() - self.parse_begin_time} nanoseconds ###")
-        logging.debug(f"COMPLETE SOURCE CODE")
-        formatted_source_code = self.get_formatted_source_code_lines(list(range(len(self.source_code))))
-        for line in formatted_source_code:
-            logging.debug(line)
+        self.log_full_source_code()
         if ast_node is not None:
             ast_json = ASTToJsonParser().parse(ast_node)
             logging.debug(json.dumps(ast_json, indent=4))

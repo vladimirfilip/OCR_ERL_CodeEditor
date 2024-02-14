@@ -17,7 +17,7 @@ class CodeEditor(QWidget):
     #
     # file path of interpreter
     #
-    INTERPRETER_PATH: str = "interpreter/interpreter.py"
+    INTERPRETER_PATH: str = "interpreter.exe"
     #
     # Storage of the file path of the file currently opened and a flag indicating the presence of unsaved changes
     #
@@ -101,8 +101,6 @@ class CodeEditor(QWidget):
         self.layout.addLayout(self.btn_layout)
         self.setStyleSheet(GLOBAL_STYLES)
 
-        self.terminal.setPlainText("qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM!\"£$%^&*()_+1234567890-=[];'#,./{}:@~<>?¬`|\\")
-        self.terminal.clear()
     @staticmethod
     def set_button_styles(buttons: list[Button]):
         for button in buttons:
@@ -157,7 +155,7 @@ class CodeEditor(QWidget):
             file.write(self.text_edit.text)
         self.terminal.clear()
         self.terminal.setFocus()
-        run_args = (sys.executable, CodeEditor.INTERPRETER_PATH, CodeEditor.TEMP_FILENAME)
+        run_args = (CodeEditor.INTERPRETER_PATH, CodeEditor.TEMP_FILENAME)
         self.terminal.run(*run_args)
 
     def on_run_btn_click(self):

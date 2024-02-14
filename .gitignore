@@ -2,3 +2,6 @@
 /t.txt
 *.pyc
 /interpreter/interpreterlog.log
+/build/interpreterlog.log
+/build/t.txt
+interpreter/test.txt
