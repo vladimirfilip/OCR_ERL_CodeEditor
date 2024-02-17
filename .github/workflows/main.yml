@@ -1,0 +1,34 @@
+name: Package Code Editor with Pyinstaller
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+  
+    steps:
+    - uses: actions/checkout@v2
+  
+    - name: Package Main Executable
+      uses: JackMcKew/pyinstaller-action-windows@main
+      with:
+        path: /main.py
+        spec: /main.spec
+
+    - name: Package Interpreter Executable
+      uses: JackMcKew/pyinstaller-action-windows@main
+      with:
+        path: interpreter/interpreter.py
+        spec: interpreter/interpreter.spec
+  
+    - uses: actions/upload-artifact@v2
+      with:
+        name: main.exe
+        path: /dist
+
+
+  
