@@ -52,8 +52,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        tag_name: ${{ steps.tag_create.outputs.tag_exists }}
-        release_name: ${{ steps.tag_create.outputs.tag_exists }}
+        tag_name: ${{ steps.tag_create.outputs.tag }}
+        release_name: ${{ steps.tag_create.outputs.tag }}
         draft: false
         prerelease: false
 
