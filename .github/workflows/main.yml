@@ -16,8 +16,8 @@ jobs:
     - name: Package Main Executable
       uses: JackMcKew/pyinstaller-action-windows@main
       with:
-        path: /main.py
-        spec: /main.spec
+        path: main.py
+        spec: main.spec
 
     - name: Package Interpreter Executable
       uses: JackMcKew/pyinstaller-action-windows@main
@@ -28,7 +28,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: main.exe
-        path: /dist
+        path: /dist/
 
 
   
