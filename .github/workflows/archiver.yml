@@ -1,0 +1,29 @@
+name: Download and Archive Artifacts
+
+on:
+  workflow_run:
+    workflows: ["main.yml"]
+    types:
+      - completed
+
+jobs:
+  download-and-archive:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download all workflow run artifacts
+      uses: actions/download-artifact@v2
+
+    - name: Install zip
+      run: sudo apt-get install zip
+
+    - name: Archive Artifacts
+      run: |
+        mkdir archive
+        zip -r archive/build.zip ./
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: build
+        path: archive/artifacts.zip
