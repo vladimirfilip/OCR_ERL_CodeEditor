@@ -163,7 +163,7 @@ class Tokenizer:
                 # with text set to the chunk minus the '"' on both ends.
                 #
                 yield (ParsedToken(line_index=Tokenizer.CURRENT_LINE)
-                       .set_val(TokenVals.STRING).set_text(chunk[1:-1]))
+                       .set_text(chunk[1:-1]).set_val(TokenVals.STRING))
             else:
                 #
                 # Eliminate white spaces
