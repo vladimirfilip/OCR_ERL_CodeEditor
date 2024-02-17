@@ -1,33 +1,26 @@
-name: Package Code Editor with Pyinstaller
-
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-  
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-latest']
+
     steps:
     - uses: actions/checkout@v2
-  
-    - name: Package Main Executable
-      uses: JackMcKew/pyinstaller-action-windows@main
+    - uses: actions/setup-python@v2
       with:
-        path: /
+        python-version: 3.11
 
-    - name: Package Interpreter Executable
-      uses: JackMcKew/pyinstaller-action-windows@main
-      with:
-        path: interpreter
-        spec: interpreter
-  
+    - run: pip install -r requirements.txt pyinstaller
+    - run: pyinstaller main.py --onefile -w
+    - run: pyinstaller interpreter/interpreter.py --onefile
     - uses: actions/upload-artifact@v2
       with:
-        name: main.exe
-        path: /dist/
-
-
-  
+        path: dist/main.exe
+    - uses: actions/upload-artifact@v2
+      with:
+        path: dist/interpreter.exe
