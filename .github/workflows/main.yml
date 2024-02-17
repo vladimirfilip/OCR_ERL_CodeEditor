@@ -20,18 +20,18 @@ jobs:
     - run: pip install -r requirements.txt pyinstaller
     - run: pyinstaller main.py --onefile -w
     - run: pyinstaller interpreter/interpreter.py --onefile
-    - uses: actions/upload-artifact@v2
-      with:
-        name: main.exe
-        path: dist/main.exe
-    - uses: actions/upload-artifact@v2
-      with:
-        name: interpreter.exe
-        path: dist/interpreter.exe
-    - uses: actions/upload-artifact@v2
-      with:
-        name: assets
-        path: assets
+    # - uses: actions/upload-artifact@v2
+    #   with:
+    #     name: main.exe
+    #     path: dist/main.exe
+    # - uses: actions/upload-artifact@v2
+    #   with:
+    #     name: interpreter.exe
+    #     path: dist/interpreter.exe
+    # - uses: actions/upload-artifact@v2
+    #   with:
+    #     name: assets
+    #     path: assets
 
   download-and-archive:
     needs: build
@@ -47,7 +47,7 @@ jobs:
     - name: Archive Artifacts
       run: |
         mkdir archive
-        zip -r archive/build.zip ./
+        zip -r archive/build.zip dist/main.exe dist/interpreter.exe assets
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
