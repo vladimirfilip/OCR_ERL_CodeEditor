@@ -17,13 +17,12 @@ jobs:
       uses: JackMcKew/pyinstaller-action-windows@main
       with:
         path: /
-        spec: main.spec
 
     - name: Package Interpreter Executable
       uses: JackMcKew/pyinstaller-action-windows@main
       with:
         path: interpreter
-        spec: interpreter/interpreter.spec
+        spec: interpreter
   
     - uses: actions/upload-artifact@v2
       with:
