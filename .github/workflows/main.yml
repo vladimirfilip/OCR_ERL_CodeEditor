@@ -1,4 +1,4 @@
-name: compile
+name: build-and-release
 
 on:
   push:
@@ -47,7 +47,7 @@ jobs:
     - name: Archive Artifacts
       run: |
         mkdir archive
-        zip -r archive/build.zip dist/main.exe dist/interpreter.exe assets
+        zip -r archive/build.zip . -i dist/main.exe dist/interpreter.exe assets
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2
