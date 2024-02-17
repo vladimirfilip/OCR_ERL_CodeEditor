@@ -2,8 +2,8 @@ import sys
 from tkinter import filedialog, messagebox
 from PyQt6 import QtGui
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QGraphicsDropShadowEffect, QLabel
-from ui.components import InputTextBox, Terminal, Button
-from ui.styles import GLOBAL_STYLES
+from components import InputTextBox, Terminal, Button
+from styles import GLOBAL_STYLES
 
 
 class CodeEditor(QWidget):
@@ -63,22 +63,22 @@ class CodeEditor(QWidget):
                               fixed_width=50,
                               fixed_height=50,
                               clicked=lambda: self.on_run_btn_click(),
-                              icon=QtGui.QIcon("ui\\play.png"))
+                              icon=QtGui.QIcon("assets\\play.png"))
         self.file_open_btn = Button(self,
                                     fixed_width=file_btn_size,
                                     fixed_height=file_btn_size,
                                     clicked=lambda: self.on_file_open_btn_click(),
-                                    icon=QtGui.QIcon("ui\\open.png"))
+                                    icon=QtGui.QIcon("assets\\open.png"))
         self.new_file_btn = Button(self,
                                    fixed_width=file_btn_size,
                                    fixed_height=file_btn_size,
                                    clicked=lambda: self.on_new_file_btn_click(),
-                                   icon=QtGui.QIcon("ui\\new.png"))
+                                   icon=QtGui.QIcon("assets\\new.png"))
         self.save_file_btn = Button(self,
                                     fixed_width=file_btn_size,
                                     fixed_height=file_btn_size,
                                     clicked=lambda: self.on_file_save_btn_click(),
-                                    icon=QtGui.QIcon("ui\\save.png"))
+                                    icon=QtGui.QIcon("assets\\save.png"))
         self.terminal.setFont(QtGui.QFont("Consolas"))
         self.btn_layout.addWidget(self.new_file_btn)
         self.btn_layout.addWidget(self.save_file_btn)
@@ -90,8 +90,8 @@ class CodeEditor(QWidget):
         # Adds binding so that when terminal starts and ends execution the icon of the
         # run button is set accordingly
         #
-        self.terminal.on_run_start = lambda: self.run_btn.setIcon(QtGui.QIcon("ui\\stop.png"))
-        self.terminal.on_run_end = lambda: self.run_btn.setIcon(QtGui.QIcon("ui\\play.png"))
+        self.terminal.on_run_start = lambda: self.run_btn.setIcon(QtGui.QIcon("assets\\stop.png"))
+        self.terminal.on_run_end = lambda: self.run_btn.setIcon(QtGui.QIcon("assets\\play.png"))
         #
         # Adds styling
         #

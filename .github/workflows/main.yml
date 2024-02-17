@@ -20,7 +20,13 @@ jobs:
     - run: pyinstaller interpreter/interpreter.py --onefile
     - uses: actions/upload-artifact@v2
       with:
+        name: main.exe
         path: dist/main.exe
     - uses: actions/upload-artifact@v2
       with:
+        name: interpreter.exe
         path: dist/interpreter.exe
+    - uses: actions/upload-artifact@v2
+      with:
+        name: assets
+        path: assets
