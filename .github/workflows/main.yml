@@ -1,0 +1,26 @@
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-latest']
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+
+    - run: pip install -r requirements.txt pyinstaller
+    - run: pyinstaller main.py --onefile -w
+    - run: pyinstaller interpreter/interpreter.py --onefile
+    - uses: actions/upload-artifact@v2
+      with:
+        path: dist/main.exe
+    - uses: actions/upload-artifact@v2
+      with:
+        path: dist/interpreter.exe
