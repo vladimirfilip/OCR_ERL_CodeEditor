@@ -1,8 +1,8 @@
-name: Download and Archive Artifacts
+name: Archive Compiled Binaries
 
 on:
   workflow_run:
-    workflows: ["main.yml"]
+    workflows: ["compile"]
     types:
       - completed
 
