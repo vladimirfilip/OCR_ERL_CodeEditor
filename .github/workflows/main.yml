@@ -16,8 +16,8 @@ jobs:
         python-version: 3.11
 
     - run: pip install -r requirements.txt pyinstaller
-    - run: pyinstaller main.py --onefile -w
-    - run: pyinstaller interpreter/interpreter.py --onefile
+    - run: pyinstaller --onefile -w main.spec
+    - run: pyinstaller --onefile interpreter/interpreter.spec
     - uses: actions/upload-artifact@v2
       with:
         name: main.exe
