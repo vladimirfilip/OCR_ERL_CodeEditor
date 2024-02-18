@@ -38,15 +38,23 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-    
+
+    - name: Create latest tag
+      uses: rickstaa/action-create-tag@v1
+      id: tag_create
+      with:
+        tag: "latest"
+        tag_exists_error: false
+        message: "Latest release"
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        tag_name: 'latest'
-        release_name: 'latest'
+        tag_name: ${{ steps.tag_create.outputs.tag }}
+        release_name: ${{ steps.tag_create.outputs.tag }}
         draft: false
         prerelease: false
 
