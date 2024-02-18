@@ -37,7 +37,8 @@ class ExeCtx(Dict[K, V]):
       - the outer object in which current execution takes place (e.g. if an object method is called, this value is set to the object storing that method) (default = None)
     """
     GLOBAL_SYM_TABLE: str = "__GLOBAL_SYM_TABLE__"
-    CUR_SYM_TABLE: str = "__CUR_SYM_TABLE__"
+    CUR_SYM_EXEC_TABLE: str = "__CUR_SYM_EXEC_TABLE__"
+    CUR_SYM_LOOKUP_TABLE: str = "__CUR_SYM_LOOKUP_TABLE"
     EVAL_RESULT: str = "__EVAL_RESULT__"
     IS_GLOBAL: str = "__IS_GLOBAL__"
     CONTINUE_DETECTED: str = "__CONTINUE_DETECTED__"
@@ -52,19 +53,29 @@ class ExeCtx(Dict[K, V]):
     def __init__(self):
         super().__init__()
         self[ExeCtx.GLOBAL_SYM_TABLE] = SymTable()
-        self[ExeCtx.CUR_SYM_TABLE] = self.global_table
+        self[ExeCtx.CUR_SYM_EXEC_TABLE] = self.global_table
+        self[ExeCtx.CUR_SYM_LOOKUP_TABLE] = self.global_table
 
     @property
     def global_table(self) -> SymTable:
         return self[ExeCtx.GLOBAL_SYM_TABLE]
 
     @property
-    def cur_table(self) -> SymTable:
-        return self[ExeCtx.CUR_SYM_TABLE]
+    def cur_exec_table(self) -> SymTable:
+        return self[ExeCtx.CUR_SYM_EXEC_TABLE]
 
-    @cur_table.setter
-    def cur_table(self, tbl: SymTable):
-        self[ExeCtx.CUR_SYM_TABLE] = tbl
+    @cur_exec_table.setter
+    def cur_exec_table(self, tbl: SymTable):
+        self[ExeCtx.CUR_SYM_EXEC_TABLE] = tbl
+        self[ExeCtx.CUR_SYM_LOOKUP_TABLE] = tbl
+
+    @property
+    def cur_lookup_table(self) -> SymTable:
+        return self[ExeCtx.CUR_SYM_LOOKUP_TABLE]
+
+    @cur_lookup_table.setter
+    def cur_lookup_table(self, tbl: SymTable):
+        self[ExeCtx.CUR_SYM_LOOKUP_TABLE] = tbl
 
     @property
     def is_global(self) -> bool:
@@ -396,7 +407,7 @@ class AstExecutor:
         :param ctx: current execution context
         :return: None
         """
-        sym_table: SymTable = ctx.cur_table
+        sym_table: SymTable = ctx.cur_exec_table
         sym_table = sym_table.root if array_decl.is_global else sym_table
         dims: list[int] = []
         for dim in array_decl.dims:
@@ -682,7 +693,7 @@ class AstExecutor:
         :param ctx: current execution context
         :return: a SymAddr instance referencing the variable named in the given Identifier node.
         """
-        tbl: SymTable = ctx.cur_table
+        tbl: SymTable = ctx.cur_lookup_table
         tbl = tbl if not ctx.is_global else tbl.root
         name: str = identifier.name
         may_be_ref: bool = name in ctx.by_ref_params
@@ -753,7 +764,8 @@ class AstExecutor:
             args = arg_node.sub_nodes
         else:
             args = [arg_node]
-        subroutine_and_parent_table: Optional[Tuple[V, 'SymTable']] = ctx.cur_table.lookup_symbol_with_table(subroutine_name)
+        subroutine_and_parent_table: Optional[Tuple[V, 'SymTable']] = ctx.cur_lookup_table.lookup_symbol_with_table(subroutine_name)
+        ctx.cur_lookup_table = ctx.cur_exec_table
         #
         # Checks that the referenced subroutine exists and can be accessed (i.e. is public or is private but current execution is in that object)
         #
@@ -796,16 +808,16 @@ class AstExecutor:
         """
         class_identifier: Identifier = new_expr.sub_nodes[0]
         constructor_args: list[Node] = new_expr.sub_nodes[1:]
-        ret: Optional[Tuple[V, SymTable]] = ctx.cur_table.lookup_symbol_with_table(class_identifier.name)
+        ret: Optional[Tuple[V, SymTable]] = ctx.cur_exec_table.lookup_symbol_with_table(class_identifier.name)
         if ret is None:
             self.__raise_error([new_expr], SyntaxError(f"'{class_identifier.name}' is not defined"))
         class_decl, tbl = ret
         _object: ObjSymTable = self.__eval_class_decl(class_decl, tbl, ctx)
-        ctx.cur_table.update_symbol(_object.storage_key, _object)
+        ctx.cur_exec_table.update_symbol(_object.storage_key, _object)
         constructor: Optional[ProcDecl] = _object.lookup_symbol(TokenContents.NEW.value)
         if constructor is not None:
             self.__eval_subroutine(constructor_args, constructor, _object, ctx, False)
-        return ctx.cur_table.addr_of(_object.storage_key)
+        return ctx.cur_exec_table.addr_of(_object.storage_key)
 
     def __eval_class_decl(self, class_decl: ClassDecl, tbl: SymTable, ctx: ExeCtx) -> ObjSymTable:
         """
@@ -848,7 +860,7 @@ class AstExecutor:
         # and sets the parent of each new ObjSymTable to the previous ObjSymTable that was higher in the stack.
         # The result is a linked list of ObjSymTable instances.
         #
-        prev_cur_table = ctx.cur_table
+        prev_cur_table = ctx.cur_exec_table
         prev_outer_class = ctx.outer_class
         obj: Optional[ObjSymTable] = None
         while stack:
@@ -859,14 +871,14 @@ class AstExecutor:
             #
             # sets the cur_table and outer_class fields of context to the current object as the values of some fields may use the values of other fields when they are first declared
             #
-            ctx.cur_table = obj
+            ctx.cur_exec_table = obj
             ctx.outer_class = obj
             for member in members:
                 name, val = get_name_and_val(member)
                 obj.add_member(name, val, member.is_public)
             parent = obj
         # Context fields reset
-        ctx.cur_table = prev_cur_table
+        ctx.cur_exec_table = prev_cur_table
         ctx.outer_class = prev_outer_class
         return obj
 
@@ -883,7 +895,7 @@ class AstExecutor:
         :return: the evaluation result
         """
         result: Optional[T] = None
-        prev_cur_table = ctx.cur_table
+        prev_cur_table = ctx.cur_exec_table
         for i in range(len(addr_expr.sub_nodes)):
             node = addr_expr.sub_nodes[i]
             is_last_node: bool = i == len(addr_expr.sub_nodes) - 1
@@ -895,10 +907,10 @@ class AstExecutor:
                     result = result.value
                 if not isinstance(result.value, ObjSymTable):
                     self.__raise_error([addr_expr], SyntaxError(f"Cannot extract fields and methods from non-object value '{result.value}'"))
-                ctx.cur_table = result.value
+                ctx.cur_lookup_table = result.value
             else:
                 result = self.__address(node, ctx) if require_address else self.__eval(node, ctx)
-        ctx.cur_table = prev_cur_table
+        ctx.cur_exec_table = prev_cur_table
         return result
 
     def __eval_identifier(self, identifier: Identifier, ctx: ExeCtx) -> T:
@@ -1086,8 +1098,8 @@ class AstExecutor:
         # Sets current table of context to the local table, executes function body,
         # extracts returned value from eval_result and sets current table to outer symbol table
         #
-        prev_cur_table: SymTable = ctx.cur_table
-        ctx.cur_table = local_table
+        prev_cur_table: SymTable = ctx.cur_exec_table
+        ctx.cur_exec_table = local_table
         self.__execute(body, ctx)
         result: T = ctx.eval_result
         #
@@ -1098,7 +1110,7 @@ class AstExecutor:
         ctx.by_ref_params = prev_by_ref_params
         ctx.return_detected = False
         ctx.eval_result = None
-        ctx.cur_table = prev_cur_table
+        ctx.cur_exec_table = prev_cur_table
         ctx.outer_class = prev_outer_class
         #
         # If result is an address to an object that is located in the local SymTable,
@@ -1109,8 +1121,8 @@ class AstExecutor:
             assert isinstance(result.value, ObjSymTable)
             if result.sym_table == local_table:
                 obj: ObjSymTable = result.value
-                ctx.cur_table.update_symbol(obj.storage_key, obj)
-                result = ctx.cur_table.addr_of(obj.storage_key)
+                ctx.cur_exec_table.update_symbol(obj.storage_key, obj)
+                result = ctx.cur_exec_table.addr_of(obj.storage_key)
         local_table.close()
         return result if result is not None else NullVal()
 
