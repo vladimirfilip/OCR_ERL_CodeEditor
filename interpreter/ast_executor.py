@@ -687,18 +687,18 @@ class AstExecutor:
         name: str = identifier.name
         may_be_ref: bool = name in ctx.by_ref_params
         #
-        # If the name is the same as that of a field in the object that contains the current context,
-        # an address to that field is returned. If the name is the same as that of a private field of any parent classes,
-        # an error is raised to prevent the returned address from being used to access private field of parent classes.
+        # If the identifier being referenced is a private field and is not part of the class in which execution takes place, an error should be returned.
         #
-        if ctx.outer_class:
-            ret: Optional[Tuple[V, SymTable]] = ctx.outer_class.lookup_symbol_with_table(name)
-            if ret is not None:
-                _, _tbl = ret
-                if _tbl == ctx.outer_class:
-                    return _tbl.addr_of(name, may_be_ref=may_be_ref)
-                if not _tbl.is_symbol_public(name):
-                    self.__raise_error([identifier], SyntaxError(f"Cannot reference private field '{name}'"))
+        ret: Optional[Tuple[V, SymTable]] = tbl.lookup_symbol_with_table(name)
+        if ret is not None:
+            _, _tbl = ret
+            if _tbl != ctx.outer_class and not _tbl.is_symbol_public(name):
+                self.__raise_error([identifier], SyntaxError(f"Cannot reference private field '{name}'"))
+            #
+            # If name references a field of an object, we want to return the address pointing directly to the field in its object symbol table.
+            #
+            if isinstance(_tbl, ObjSymTable):
+                return _tbl.addr_of(name, may_be_ref=may_be_ref)
         #
         # Otherwise, return address with sym_table set to the local or global scope.
         #
