@@ -1,3 +1,5 @@
+name: build-and-release
+
 on:
   push:
 
@@ -17,16 +19,67 @@ jobs:
 
     - run: pip install -r requirements.txt pyinstaller
     - run: pyinstaller main.py --onefile -w
-    - run: pyinstaller interpreter.py --onefile
-    - uses: actions/upload-artifact@v2
+    - run: pyinstaller interpreter/interpreter.py --onefile
+
+  zip-files:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vimtor/action-zip@v1.1
+        with:
+          files: dist/interpreter.exe dist/main.exe assets/
+          dest: build.zip
+
+  release:
+    needs: [build, zip-files]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Generate Git Tag
+      id: generate_tag
+      run: |
+        VERSION_PREFIX="v"
+        VERSION_MAJOR_MINOR="1.0"
+        VERSION_PATCH=$(git tag --list "${VERSION_PREFIX}${VERSION_MAJOR_MINOR}.*" --sort=-version:refname | head -n 1 | grep -oE '[0-9]+$')
+        if [ -z "$VERSION_PATCH" ]; then
+          VERSION_PATCH=0
+        else
+          VERSION_PATCH=$((VERSION_PATCH + 1))
+        fi
+        NEW_TAG="${VERSION_PREFIX}${VERSION_MAJOR_MINOR}.${VERSION_PATCH}"
+        echo "Generated new tag: $NEW_TAG"
+        echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+
+    - name: Push Git Tag
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "github-actions@users.noreply.github.com"
+        git tag $NEW_TAG
+        git push origin $NEW_TAG
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        name: main.exe
-        path: dist/main.exe
-    - uses: actions/upload-artifact@v2
+        tag_name: $NEW_TAG
+        release_name: $NEW_TAG
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: interpreter.exe
-        path: dist/interpreter.exe
-    - uses: actions/upload-artifact@v2
-      with:
-        name: assets
-        path: assets
+        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        asset_path: build.zip
+        asset_name: build.zip
+        asset_content_type: application/zip
+  
