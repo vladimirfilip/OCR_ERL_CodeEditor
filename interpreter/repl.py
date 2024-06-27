@@ -81,6 +81,10 @@ def detect_input_usage(code_string):
 
 
 def replace_input_with_string(code_string, new_value):
+    # Example:
+    # Input: x = input("Hello"), "hi"
+    # Output: x =  "hi"
+
     pattern = r'input\s*\([^\)]*\)'
     replacement = f'"{new_value}"'
     return re.sub(pattern, replacement, code_string)
@@ -93,24 +97,32 @@ depth = 0
 symbols = [
     ">", ".", "-", "=", "→", "⇒", "►", "→", "≥"]
 
+# For example: if you write "function name(parameters)", it makes no sense to evaluate this code straight away
+# since it will always yield an error, due there being no way to finish the function
+# In this case, the REPL should wait for endfunction to be written before evaluating all of the code block
 increase_depth_words = ["for", "while", "do", "if", "switch", "function", "procedure", "class"]
 decrease_depth_words = ["next", "endwhile", "until", "endif", "endswitch", "endfunction", "endprocedure", "endclass"]
+# Code is evaluated when depth = 0
 
 while "quit()" not in lines:
     error = False
 
-    # Clear the stream
+    # Clear the output stream
     output_buffer.seek(0)
     output_buffer.truncate(0)
 
     next_line = input((symbols[depth % len(symbols)] * 3) + " ")
+
+    # Handle inputs manually and rewrite them to make code deterministic
     is_input, text = detect_input_usage(next_line)
     if is_input:
         value_inputted = input(text)
         next_line = replace_input_with_string(next_line, value_inputted)
 
-    # Use split to avoid issues such as "if" being in "endif" and being flagged as both
+    # Use split to avoid issues such as "if" being in "endif" and being flagged as both incrementer and decrementer of depth
     for i in increase_depth_words:
+        # All increase/decrease depth words are the first words in their line
+        # The only exception is in classes where public/private may be specified
         if i == next_line.split()[0] or ((next_line.split()[0] == "public" or next_line.split()[0] == "private") and i == next_line.split()[1]):
             depth += 1
             break
@@ -138,9 +150,12 @@ while "quit()" not in lines:
 
             # Remove empty [""]
             output.pop()
+
+            # Relies on ERL programs being deterministic, and yielding the same output on every run
             if len(output) > num_of_outputs:
                 for i in range(num_of_outputs, len(output)):
                     print(output[i])
             num_of_outputs = len(output)
     else:
+        # If depth != 0, don't run code
         indented_block.append(next_line)
