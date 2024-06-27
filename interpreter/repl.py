@@ -96,9 +96,18 @@ num_of_outputs = 0
 depth = 0
 symbols = [
     ">", ".", "-", "=", "→", "⇒", "►", "→", "≥"]
+# Show a different symbol depending on depth level
+
+# When a line starts with an increase_depth_word, the REPL enters a new indented block
+# and waits for more input before executing. When a corresponding decrease_depth_word
+# is encountered, the block is closed. This allows for proper handling of multi-line
+# constructs like functions, loops, and conditional statements.
+#
+# Note: For class definitions, 'public' or 'private' may precede the keyword,
+# so we only have to check the first word, only checking the second if the first word is a public/private.
 
 # For example: if you write "function name(parameters)", it makes no sense to evaluate this code straight away
-# since it will always yield an error, due there being no way to finish the function
+# since it will always yield an error, due to there being no way to finish the function
 # In this case, the REPL should wait for endfunction to be written before evaluating all of the code block
 increase_depth_words = ["for", "while", "do", "if", "switch", "function", "procedure", "class"]
 decrease_depth_words = ["next", "endwhile", "until", "endif", "endswitch", "endfunction", "endprocedure", "endclass"]
@@ -121,8 +130,6 @@ while "quit()" not in lines:
 
     # Use split to avoid issues such as "if" being in "endif" and being flagged as both incrementer and decrementer of depth
     for i in increase_depth_words:
-        # All increase/decrease depth words are the first words in their line
-        # The only exception is in classes where public/private may be specified
         if i == next_line.split()[0] or ((next_line.split()[0] == "public" or next_line.split()[0] == "private") and i == next_line.split()[1]):
             depth += 1
             break
