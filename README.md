@@ -1,7 +1,8 @@
 # OCR_ERL_CodeEditor
 
 ## Introduction
-This is a simple code editor made for writing programs in the UK exam board OCR's Exam Reference Language (ERL). It comes with a built-in LL(1) interpreter and a simple UI made with PyQt6, through which the user can create, save and open text files containing ERL source code and run ERL code from the same interface. 
+This is a simple code editor made for writing programs in the UK exam board OCR's Exam Reference Language (ERL). It comes with a built-in LL(1) interpreter and a simple UI made with PyQt6, through which the user can create, save and open text files containing ERL source code and run ERL code from the same interface.
+To run the editor, simply clone/fork the repo and run `main.py`.
 
 ## For running interpreter on command-line                             
 Have Python 3.11 installed on your device and added to environment variables. To test, open command prompt and type `python --version`.
